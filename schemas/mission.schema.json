@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/mission.schema.json",
+  "title": "Mission",
+  "type": "object",
+  "required": ["schema_version", "mission_id", "title", "sponsor", "required_capabilities", "governance", "projection_request"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "mission_id": {"type": "string", "pattern": "^mission_[a-zA-Z0-9_-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string"},
+    "sponsor": {
+      "type": "object",
+      "required": ["name", "recipient_id"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "recipient_id": {"type": "string"},
+        "jurisdiction_hint": {"type": "string"}
+      }
+    },
+    "required_capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["capability", "minimum_level"],
+        "additionalProperties": false,
+        "properties": {
+          "capability": {"type": "string"},
+          "minimum_level": {"type": "string", "enum": ["awareness", "apprentice", "practitioner", "lead", "expert"]},
+          "evidence_required": {"type": "boolean"},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "work_mode": {"type": "string"},
+        "time_zone": {"type": "string"},
+        "availability_window": {"type": "string"},
+        "compensation_posture": {"type": "string"},
+        "legal_or_compliance_notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "governance": {
+      "type": "object",
+      "required": ["authority_band", "audit_required", "human_approval_required"],
+      "additionalProperties": false,
+      "properties": {
+        "authority_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
+        "audit_required": {"type": "boolean"},
+        "human_approval_required": {"type": "boolean"},
+        "conformance_tags": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "projection_request": {
+      "type": "object",
+      "required": ["purpose", "requested_fields", "expires_at"],
+      "additionalProperties": false,
+      "properties": {
+        "purpose": {"type": "string"},
+        "requested_fields": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}
