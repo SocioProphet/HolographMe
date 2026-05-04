@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/human-digital-twin.schema.json",
+  "title": "HumanDigitalTwin",
+  "type": "object",
+  "required": ["schema_version", "twin_id", "subject", "ownership", "capability_claims", "consent_policy_ids", "transition_receipts"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+    "subject": {
+      "type": "object",
+      "required": ["subject_id", "display_name"],
+      "additionalProperties": false,
+      "properties": {
+        "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+        "display_name": {"type": "string", "minLength": 1},
+        "preferred_contact": {"type": "string"},
+        "jurisdiction_hint": {"type": "string"}
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "required": ["owner_subject_id", "portability", "revocation_supported"],
+      "additionalProperties": false,
+      "properties": {
+        "owner_subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+        "custodian": {"type": "string"},
+        "portability": {"type": "boolean"},
+        "revocation_supported": {"type": "boolean"}
+      }
+    },
+    "capability_claims": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/capability_claim"}
+    },
+    "preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "work_modes": {"type": "array", "items": {"type": "string"}},
+        "preferred_mission_types": {"type": "array", "items": {"type": "string"}},
+        "availability": {"type": "string"},
+        "compensation_posture": {"type": "string"},
+        "constraints": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "credentials": {"type": "array", "items": {"$ref": "#/$defs/evidence_artifact"}},
+    "portfolio": {"type": "array", "items": {"$ref": "#/$defs/evidence_artifact"}},
+    "assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["assessment_id", "assessment_type", "timestamp", "summary", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "assessment_id": {"type": "string", "pattern": "^assess_[a-zA-Z0-9_-]+$"},
+          "assessment_type": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "summary": {"type": "string"},
+          "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+          "evidence_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "delegated_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "allowed_actions", "authority_band", "expires_at"],
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {"type": "string"},
+          "allowed_actions": {"type": "array", "items": {"type": "string"}},
+          "authority_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
+          "expires_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "consent_policy_ids": {"type": "array", "items": {"type": "string", "pattern": "^cp_[a-zA-Z0-9_-]+$"}},
+    "transition_receipts": {"type": "array", "items": {"type": "string", "pattern": "^tr_[a-zA-Z0-9_-]+$"}},
+    "state_hash": {"type": "string"}
+  },
+  "$defs": {
+    "capability_claim": {
+      "type": "object",
+      "required": ["claim_id", "capability", "level", "verification_status", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {"type": "string", "pattern": "^claim_[a-zA-Z0-9_-]+$"},
+        "capability": {"type": "string", "minLength": 1},
+        "level": {"type": "string", "enum": ["awareness", "apprentice", "practitioner", "lead", "expert"]},
+        "verification_status": {"type": "string", "enum": ["self_attested", "evidence_attached", "verified", "disputed", "expired"]},
+        "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_artifact"}}
+      }
+    },
+    "evidence_artifact": {
+      "type": "object",
+      "required": ["evidence_id", "source_type", "description", "trust_posture"],
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^ev_[a-zA-Z0-9_-]+$"},
+        "source_type": {"type": "string", "enum": ["portfolio", "credential", "assessment", "reference", "mission_outcome", "repository", "document", "other"]},
+        "description": {"type": "string"},
+        "uri": {"type": "string"},
+        "digest": {"type": "string"},
+        "issuer": {"type": "string"},
+        "collected_at": {"type": "string", "format": "date-time"},
+        "trust_posture": {"type": "string", "enum": ["unverified", "source_attested", "third_party_verified", "system_verified"]},
+        "legal_use_tags": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
