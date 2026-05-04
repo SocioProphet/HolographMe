@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1.0",
+  "twin_id": "hdt_example_alpha",
+  "subject": {
+    "subject_id": "sub_example_alpha",
+    "display_name": "Example Operator",
+    "preferred_contact": "example@example.com",
+    "jurisdiction_hint": "US"
+  },
+  "ownership": {
+    "owner_subject_id": "sub_example_alpha",
+    "custodian": "SocioProphet HolographMe",
+    "portability": true,
+    "revocation_supported": true
+  },
+  "capability_claims": [
+    {
+      "claim_id": "claim_agentic_systems_001",
+      "capability": "Agentic systems design",
+      "level": "practitioner",
+      "verification_status": "evidence_attached",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "evidence_id": "ev_repo_001",
+          "source_type": "repository",
+          "description": "Public repository contribution demonstrating agentic workflow design.",
+          "uri": "https://github.com/example/repo",
+          "trust_posture": "source_attested",
+          "legal_use_tags": ["portfolio", "mission_fit"]
+        }
+      ]
+    }
+  ],
+  "preferences": {
+    "work_modes": ["remote", "agentic_consulting"],
+    "preferred_mission_types": ["platform_design", "governance_architecture"],
+    "availability": "part_time",
+    "compensation_posture": "project_or_retainer",
+    "constraints": ["requires explicit consent before client disclosure"]
+  },
+  "credentials": [],
+  "portfolio": [],
+  "assessments": [
+    {
+      "assessment_id": "assess_initial_001",
+      "assessment_type": "competency_interview",
+      "timestamp": "2026-05-04T18:00:00Z",
+      "summary": "Initial interview indicates practical capability in agentic systems design and governance framing.",
+      "confidence": "medium",
+      "evidence_ids": ["ev_repo_001"]
+    }
+  ],
+  "delegated_agents": [
+    {
+      "agent_id": "agent_intake_001",
+      "allowed_actions": ["summarize", "recommend_missions"],
+      "authority_band": "recommend",
+      "expires_at": "2026-06-04T18:00:00Z"
+    }
+  ],
+  "consent_policy_ids": ["cp_example_alpha"],
+  "transition_receipts": ["tr_initial_001"],
+  "state_hash": "sha256:example"
+}
