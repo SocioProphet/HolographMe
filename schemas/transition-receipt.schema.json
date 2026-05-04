@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/transition-receipt.schema.json",
+  "title": "TransitionReceipt",
+  "type": "object",
+  "required": ["schema_version", "receipt_id", "twin_id", "action", "actor", "timestamp", "policy_version", "previous_state_hash", "new_state_hash", "approval_band"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "receipt_id": {"type": "string", "pattern": "^tr_[a-zA-Z0-9_-]+$"},
+    "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+    "action": {"type": "string"},
+    "actor": {
+      "type": "object",
+      "required": ["actor_id", "actor_type"],
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {"type": "string"},
+        "actor_type": {"type": "string", "enum": ["subject", "agent", "operator", "system"]}
+      }
+    },
+    "timestamp": {"type": "string", "format": "date-time"},
+    "policy_version": {"type": "string"},
+    "previous_state_hash": {"type": "string"},
+    "new_state_hash": {"type": "string"},
+    "evidence_links": {"type": "array", "items": {"type": "string"}},
+    "approval_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rollback_supported": {"type": "boolean"},
+        "rollback_method": {"type": "string"},
+        "irreversible_acknowledged": {"type": "boolean"}
+      }
+    },
+    "replay_hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "transition_library_version": {"type": "string"},
+        "input_snapshot_uri": {"type": "string"},
+        "runtime_version": {"type": "string"}
+      }
+    }
+  }
+}
