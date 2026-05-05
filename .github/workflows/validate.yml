@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  schemas:
-    name: Validate schemas and examples
+  schemas-and-runtime:
+    name: Validate schemas, examples, and projection runtime
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -24,3 +24,17 @@ jobs:
 
       - name: Validate JSON Schemas and examples
         run: python scripts/validate_schemas.py
+
+      - name: Run projection runtime tests
+        run: python -m unittest discover -s tests
+
+      - name: Exercise projection CLI
+        run: |
+          python scripts/generate_projection.py \
+            --twin examples/human-digital-twin.example.json \
+            --consent examples/consent-policy.example.json \
+            --mission examples/mission.example.json \
+            --out generated/projection.json \
+            --receipt-out generated/receipt.json \
+            --now 2026-05-04T18:30:00Z \
+            --receipt-id tr_projection_001
