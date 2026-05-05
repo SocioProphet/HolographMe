@@ -1,0 +1,34 @@
+{
+  "schema_version": "0.1.0",
+  "policy_id": "cp_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "allowed_recipients": ["recipient_socioprophet_consulting"],
+  "allowed_purposes": ["mission_fit", "competency_assessment"],
+  "allowed_fields": [
+    "subject.display_name",
+    "capability_claims.capability",
+    "capability_claims.level",
+    "capability_claims.verification_status",
+    "preferences.work_modes",
+    "preferences.availability"
+  ],
+  "forbidden_fields": ["precise_home_location", "protected_class_attributes", "private_references"],
+  "projection_templates": ["mission_fit_projection"],
+  "expires_at": "2026-06-04T18:00:00Z",
+  "retention_rule": "delete_or_reconfirm_after_expiration",
+  "revocation": {
+    "revocable": true,
+    "method": "subject_dashboard_or_signed_request",
+    "contact": "governance@socioprophet.ai"
+  },
+  "delegation": {
+    "agents_allowed": true,
+    "allowed_agent_actions": ["summarize", "recommend_missions"],
+    "max_authority_band": "recommend"
+  },
+  "audit": {
+    "log_access": true,
+    "emit_receipts": true,
+    "notify_subject": true
+  }
+}
