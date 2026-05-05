@@ -1,0 +1,44 @@
+{
+  "allowed_fields": [
+    "capability_claims.capability",
+    "capability_claims.level",
+    "capability_claims.verification_status",
+    "preferences.availability",
+    "preferences.work_modes",
+    "subject.display_name"
+  ],
+  "data": {
+    "capability_claims": [
+      {
+        "capability": "Agentic systems design",
+        "level": "practitioner",
+        "verification_status": "evidence_attached"
+      }
+    ],
+    "preferences": {
+      "availability": "part_time",
+      "work_modes": [
+        "remote",
+        "agentic_consulting"
+      ]
+    },
+    "subject": {
+      "display_name": "Example Operator"
+    }
+  },
+  "denied_fields": [
+    {
+      "field": "assessments.summary",
+      "reason": "not_allowed_by_consent_policy"
+    }
+  ],
+  "generated_at": "2026-05-04T18:30:00Z",
+  "mission_id": "mission_agentic_governance_001",
+  "policy_id": "cp_example_alpha",
+  "projection_id": "proj_mission_agentic_governance_001_hdt_example_alpha",
+  "purpose": "mission_fit",
+  "recipient_id": "recipient_socioprophet_consulting",
+  "schema_version": "0.1.0",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha"
+}
