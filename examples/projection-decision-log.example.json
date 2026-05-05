@@ -1,0 +1,56 @@
+{
+  "decision_log_id": "pdl_projection_001",
+  "decisions": [
+    {
+      "decision": "allow",
+      "field": "subject.display_name",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "subject.display_name"
+    },
+    {
+      "decision": "allow",
+      "field": "capability_claims.capability",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "capability_claims"
+    },
+    {
+      "decision": "allow",
+      "field": "capability_claims.level",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "capability_claims"
+    },
+    {
+      "decision": "allow",
+      "field": "capability_claims.verification_status",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "capability_claims"
+    },
+    {
+      "decision": "allow",
+      "field": "preferences.work_modes",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "preferences.work_modes"
+    },
+    {
+      "decision": "allow",
+      "field": "preferences.availability",
+      "reason": "allowed_by_consent_policy",
+      "requested_field": "preferences.availability"
+    },
+    {
+      "decision": "deny",
+      "field": "assessments.summary",
+      "reason": "not_allowed_by_consent_policy",
+      "requested_field": "assessments.summary"
+    }
+  ],
+  "generated_at": "2026-05-04T18:30:00Z",
+  "mission_id": "mission_agentic_governance_001",
+  "policy_id": "cp_example_alpha",
+  "projection_id": "proj_mission_agentic_governance_001_hdt_example_alpha",
+  "purpose": "mission_fit",
+  "recipient_id": "recipient_socioprophet_consulting",
+  "schema_version": "0.1.0",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha"
+}
