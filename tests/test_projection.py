@@ -33,10 +33,12 @@ class ProjectionTests(unittest.TestCase):
             self.mission,
             now="2026-05-04T18:30:00Z",
             receipt_id="tr_projection_001",
+            decision_log_id="pdl_projection_001",
         )
 
         projection = result["projection"]
         receipt = result["receipt"]
+        decision_log = result["decision_log"]
 
         self.assertEqual(projection["purpose"], "mission_fit")
         self.assertEqual(projection["data"]["subject"]["display_name"], "Example Operator")
@@ -55,23 +57,32 @@ class ProjectionTests(unittest.TestCase):
         )
         self.assertEqual(receipt["action"], "mission_fit_projection")
         self.assertEqual(receipt["approval_band"], "recommend")
+        self.assertIn("pdl_projection_001", receipt["evidence_links"])
         self.assertTrue(receipt["new_state_hash"].startswith("sha256:"))
 
-    def test_projection_and_receipt_validate_against_schemas(self):
+        self.assertEqual(decision_log["decision_log_id"], "pdl_projection_001")
+        self.assertEqual(decision_log["projection_id"], projection["projection_id"])
+        self.assertEqual(decision_log["decisions"][-1]["decision"], "deny")
+        self.assertEqual(decision_log["decisions"][-1]["field"], "assessments.summary")
+
+    def test_projection_receipt_and_decision_log_validate_against_schemas(self):
         result = generate_projection(
             self.twin,
             self.consent,
             self.mission,
             now="2026-05-04T18:30:00Z",
             receipt_id="tr_projection_001",
+            decision_log_id="pdl_projection_001",
         )
 
         projection_schema = load_json(SCHEMAS / "projection.schema.json")
         receipt_schema = load_json(SCHEMAS / "transition-receipt.schema.json")
+        decision_log_schema = load_json(SCHEMAS / "projection-decision-log.schema.json")
 
         Draft202012Validator.check_schema(projection_schema)
         Draft202012Validator(projection_schema).validate(result["projection"])
         Draft202012Validator(receipt_schema).validate(result["receipt"])
+        Draft202012Validator(decision_log_schema).validate(result["decision_log"])
 
     def test_rejects_expired_consent(self):
         consent = copy.deepcopy(self.consent)
