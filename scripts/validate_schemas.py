@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Validate HolographMe JSON examples against local JSON Schemas.
-
-The script intentionally uses the Python standard library for baseline JSON parsing
-and imports jsonschema only for full schema validation. CI installs jsonschema.
-"""
+"""Validate HolographMe JSON examples against local JSON Schemas."""
 
 from __future__ import annotations
 
@@ -21,6 +17,7 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "consent-policy.example.json": "consent-policy.schema.json",
     "mission.example.json": "mission.schema.json",
     "transition-receipt.example.json": "transition-receipt.schema.json",
+    "projection.example.json": "projection.schema.json",
 }
 
 
