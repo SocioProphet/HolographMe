@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "mission_id": "mission_agentic_governance_001",
+  "title": "Agentic governance architecture sprint",
+  "summary": "A bounded consulting mission to design consent, audit, and approval-band controls for an agentic staffing workflow.",
+  "sponsor": {
+    "name": "SocioProphet Consulting",
+    "recipient_id": "recipient_socioprophet_consulting",
+    "jurisdiction_hint": "US"
+  },
+  "required_capabilities": [
+    {
+      "capability": "Agentic systems design",
+      "minimum_level": "practitioner",
+      "evidence_required": true,
+      "notes": "Must understand bounded authority, replay, and governance receipts."
+    },
+    {
+      "capability": "Governance architecture",
+      "minimum_level": "practitioner",
+      "evidence_required": true
+    }
+  ],
+  "constraints": {
+    "work_mode": "remote",
+    "time_zone": "America/New_York",
+    "availability_window": "two_week_sprint",
+    "compensation_posture": "project",
+    "legal_or_compliance_notes": ["No sensitive client data in initial discovery slice."]
+  },
+  "governance": {
+    "authority_band": "recommend",
+    "audit_required": true,
+    "human_approval_required": true,
+    "conformance_tags": ["consent_scoped", "receipt_required", "human_review"]
+  },
+  "projection_request": {
+    "purpose": "mission_fit",
+    "requested_fields": [
+      "subject.display_name",
+      "capability_claims",
+      "preferences.work_modes",
+      "preferences.availability",
+      "assessments.summary"
+    ],
+    "expires_at": "2026-06-04T18:00:00Z"
+  }
+}
