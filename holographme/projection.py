@@ -20,6 +20,14 @@ class ProjectionError(ValueError):
     """Raised when a projection request violates policy or input constraints."""
 
 
+class ProjectionRejected(ProjectionError):
+    """Raised when policy rejects a projection request but an audit log exists."""
+
+    def __init__(self, message: str, decision_log: Mapping[str, Any]):
+        super().__init__(message)
+        self.decision_log = dict(decision_log)
+
+
 def load_json(path: str | Path) -> Dict[str, Any]:
     with Path(path).open("r", encoding="utf-8") as handle:
         value = json.load(handle)
@@ -135,32 +143,8 @@ def merge_lists(existing: List[Any], incoming: List[Any]) -> List[Any]:
 
 
 def safe_slug(value: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9_-]+", "_", value).strip("_")
-
-
-def validate_projection_inputs(
-    twin: Mapping[str, Any],
-    consent: Mapping[str, Any],
-    mission: Mapping[str, Any],
-    *,
-    now: Optional[str] = None,
-) -> None:
-    subject_id = twin.get("subject", {}).get("subject_id")
-    if consent.get("subject_id") != subject_id:
-        raise ProjectionError("Consent policy subject_id does not match twin subject.subject_id")
-
-    recipient_id = mission.get("sponsor", {}).get("recipient_id")
-    if recipient_id not in consent.get("allowed_recipients", []):
-        raise ProjectionError(f"Mission recipient is not allowed by consent policy: {recipient_id}")
-
-    purpose = mission.get("projection_request", {}).get("purpose")
-    if purpose not in consent.get("allowed_purposes", []):
-        raise ProjectionError(f"Mission projection purpose is not allowed by consent policy: {purpose}")
-
-    check_time = parse_instant(now or now_utc_iso())
-    expires_at = parse_instant(str(consent["expires_at"]))
-    if check_time > expires_at:
-        raise ProjectionError(f"Consent policy expired at {consent['expires_at']}")
+    slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", value).strip("_")
+    return slug or "unknown"
 
 
 def make_decision(
@@ -176,6 +160,159 @@ def make_decision(
     return payload
 
 
+def projection_identifiers(
+    twin: Mapping[str, Any],
+    consent: Mapping[str, Any],
+    mission: Mapping[str, Any],
+    *,
+    decision_log_id: Optional[str] = None,
+) -> Dict[str, str]:
+    twin_id = str(twin.get("twin_id", "hdt_unknown"))
+    mission_id = str(mission.get("mission_id", "mission_unknown"))
+    subject = twin.get("subject", {}) if isinstance(twin.get("subject", {}), Mapping) else {}
+    sponsor = mission.get("sponsor", {}) if isinstance(mission.get("sponsor", {}), Mapping) else {}
+    projection_request = mission.get("projection_request", {}) if isinstance(mission.get("projection_request", {}), Mapping) else {}
+
+    projection_id = "proj_" + safe_slug(f"{mission_id}_{twin_id}")
+    return {
+        "twin_id": twin_id,
+        "subject_id": str(subject.get("subject_id", "sub_unknown")),
+        "mission_id": mission_id,
+        "recipient_id": str(sponsor.get("recipient_id", "recipient_unknown")),
+        "purpose": str(projection_request.get("purpose", "unknown")),
+        "policy_id": str(consent.get("policy_id", "cp_unknown")),
+        "projection_id": projection_id,
+        "decision_log_id": decision_log_id or "pdl_" + safe_slug(f"{mission_id}_{twin_id}"),
+    }
+
+
+def build_decision_log(
+    twin: Mapping[str, Any],
+    consent: Mapping[str, Any],
+    mission: Mapping[str, Any],
+    *,
+    generated_at: str,
+    decisions: List[Dict[str, str]],
+    decision_log_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    ids = projection_identifiers(twin, consent, mission, decision_log_id=decision_log_id)
+    return {
+        "schema_version": "0.1.0",
+        "decision_log_id": ids["decision_log_id"],
+        "projection_id": ids["projection_id"],
+        "twin_id": ids["twin_id"],
+        "subject_id": ids["subject_id"],
+        "mission_id": ids["mission_id"],
+        "recipient_id": ids["recipient_id"],
+        "policy_id": ids["policy_id"],
+        "purpose": ids["purpose"],
+        "generated_at": generated_at,
+        "decisions": decisions,
+    }
+
+
+def evaluate_projection_preflight(
+    twin: Mapping[str, Any],
+    consent: Mapping[str, Any],
+    mission: Mapping[str, Any],
+    *,
+    generated_at: str,
+    decision_log_id: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Return a rejection decision log when the projection request is invalid."""
+
+    decisions: List[Dict[str, str]] = []
+    subject_id = twin.get("subject", {}).get("subject_id") if isinstance(twin.get("subject", {}), Mapping) else None
+    consent_subject_id = consent.get("subject_id")
+    if consent_subject_id != subject_id:
+        decisions.append(
+            make_decision(
+                field="$request.subject_id",
+                requested_field="$request",
+                decision="deny",
+                reason="subject_mismatch",
+            )
+        )
+
+    recipient_id = mission.get("sponsor", {}).get("recipient_id") if isinstance(mission.get("sponsor", {}), Mapping) else None
+    if recipient_id not in consent.get("allowed_recipients", []):
+        decisions.append(
+            make_decision(
+                field="$request.recipient_id",
+                requested_field="$request",
+                decision="deny",
+                reason="recipient_not_allowed",
+            )
+        )
+
+    purpose = mission.get("projection_request", {}).get("purpose") if isinstance(mission.get("projection_request", {}), Mapping) else None
+    if purpose not in consent.get("allowed_purposes", []):
+        decisions.append(
+            make_decision(
+                field="$request.purpose",
+                requested_field="$request",
+                decision="deny",
+                reason="purpose_not_allowed",
+            )
+        )
+
+    try:
+        check_time = parse_instant(generated_at)
+        expires_at = parse_instant(str(consent["expires_at"]))
+    except (KeyError, TypeError, ValueError):
+        decisions.append(
+            make_decision(
+                field="$request.expires_at",
+                requested_field="$request",
+                decision="deny",
+                reason="consent_expiration_invalid",
+            )
+        )
+    else:
+        if check_time > expires_at:
+            decisions.append(
+                make_decision(
+                    field="$request.expires_at",
+                    requested_field="$request",
+                    decision="deny",
+                    reason="consent_policy_expired",
+                )
+            )
+
+    if not decisions:
+        return None
+
+    return build_decision_log(
+        twin,
+        consent,
+        mission,
+        generated_at=generated_at,
+        decisions=decisions,
+        decision_log_id=decision_log_id,
+    )
+
+
+def validate_projection_inputs(
+    twin: Mapping[str, Any],
+    consent: Mapping[str, Any],
+    mission: Mapping[str, Any],
+    *,
+    now: Optional[str] = None,
+    decision_log_id: Optional[str] = None,
+) -> None:
+    generated_at = now or now_utc_iso()
+    rejection_log = evaluate_projection_preflight(
+        twin,
+        consent,
+        mission,
+        generated_at=generated_at,
+        decision_log_id=decision_log_id,
+    )
+    if rejection_log is not None:
+        reasons = ", ".join(decision["reason"] for decision in rejection_log["decisions"])
+        raise ProjectionRejected(f"projection rejected by policy: {reasons}", rejection_log)
+
+
 def generate_projection(
     twin: Mapping[str, Any],
     consent: Mapping[str, Any],
@@ -188,7 +325,7 @@ def generate_projection(
     """Generate a consent-scoped mission-fit projection, receipt, and decision log."""
 
     generated_at = now or now_utc_iso()
-    validate_projection_inputs(twin, consent, mission, now=generated_at)
+    validate_projection_inputs(twin, consent, mission, now=generated_at, decision_log_id=decision_log_id)
 
     requested_fields = list(mission.get("projection_request", {}).get("requested_fields", []))
     allowed_fields = list(consent.get("allowed_fields", []))
@@ -200,11 +337,19 @@ def generate_projection(
     decisions: List[Dict[str, str]] = []
 
     for requested in requested_fields:
-        matching_allowed = [
-            field
-            for field in allowed_fields
-            if requested_allows_field(requested, field) and not is_forbidden(field, forbidden_fields)
-        ]
+        if is_forbidden(requested, forbidden_fields):
+            denied_fields.append({"field": requested, "reason": "forbidden_by_consent_policy"})
+            decisions.append(
+                make_decision(
+                    field=requested,
+                    requested_field=requested,
+                    decision="deny",
+                    reason="forbidden_by_consent_policy",
+                )
+            )
+            continue
+
+        matching_allowed = [field for field in allowed_fields if requested_allows_field(requested, field)]
 
         if not matching_allowed:
             denied_fields.append({"field": requested, "reason": "not_allowed_by_consent_policy"})
@@ -255,45 +400,37 @@ def generate_projection(
                 )
             )
 
-    twin_id = str(twin["twin_id"])
-    mission_id = str(mission["mission_id"])
-    projection_id = "proj_" + safe_slug(f"{mission_id}_{twin_id}")
-    receipt_identifier = receipt_id or "tr_" + safe_slug(f"projection_{mission_id}_{twin_id}")
-    decision_log_identifier = decision_log_id or "pdl_" + safe_slug(f"{mission_id}_{twin_id}")
+    ids = projection_identifiers(twin, consent, mission, decision_log_id=decision_log_id)
+    receipt_identifier = receipt_id or "tr_" + safe_slug(f"projection_{ids['mission_id']}_{ids['twin_id']}")
 
     projection_body = {
         "schema_version": "0.1.0",
-        "projection_id": projection_id,
-        "twin_id": twin_id,
-        "subject_id": twin["subject"]["subject_id"],
-        "mission_id": mission_id,
-        "recipient_id": mission["sponsor"]["recipient_id"],
-        "purpose": mission["projection_request"]["purpose"],
+        "projection_id": ids["projection_id"],
+        "twin_id": ids["twin_id"],
+        "subject_id": ids["subject_id"],
+        "mission_id": ids["mission_id"],
+        "recipient_id": ids["recipient_id"],
+        "purpose": ids["purpose"],
         "generated_at": generated_at,
-        "policy_id": consent["policy_id"],
+        "policy_id": ids["policy_id"],
         "allowed_fields": sorted(set(exposed_fields)),
         "denied_fields": denied_fields,
         "data": data,
     }
 
-    decision_log = {
-        "schema_version": "0.1.0",
-        "decision_log_id": decision_log_identifier,
-        "projection_id": projection_id,
-        "twin_id": twin_id,
-        "subject_id": twin["subject"]["subject_id"],
-        "mission_id": mission_id,
-        "recipient_id": mission["sponsor"]["recipient_id"],
-        "policy_id": consent["policy_id"],
-        "purpose": mission["projection_request"]["purpose"],
-        "generated_at": generated_at,
-        "decisions": decisions,
-    }
+    decision_log = build_decision_log(
+        twin,
+        consent,
+        mission,
+        generated_at=generated_at,
+        decisions=decisions,
+        decision_log_id=ids["decision_log_id"],
+    )
 
     receipt = {
         "schema_version": "0.1.0",
         "receipt_id": receipt_identifier,
-        "twin_id": twin_id,
+        "twin_id": ids["twin_id"],
         "action": "mission_fit_projection",
         "actor": {
             "actor_id": "holographme_projection_runtime",
@@ -303,7 +440,7 @@ def generate_projection(
         "policy_version": str(consent.get("schema_version", "0.1.0")),
         "previous_state_hash": str(twin.get("state_hash", "sha256:unknown")),
         "new_state_hash": canonical_hash(projection_body),
-        "evidence_links": [consent["policy_id"], mission_id, decision_log_identifier],
+        "evidence_links": [ids["policy_id"], ids["mission_id"], ids["decision_log_id"]],
         "approval_band": mission["governance"]["authority_band"],
         "rollback": {
             "rollback_supported": True,
@@ -312,7 +449,7 @@ def generate_projection(
         },
         "replay_hints": {
             "transition_library_version": "0.1.0",
-            "input_snapshot_uri": f"urn:holographme:projection-input:{projection_id}",
+            "input_snapshot_uri": f"urn:holographme:projection-input:{ids['projection_id']}",
             "runtime_version": "holographme-projection-runtime-0.1.0",
         },
     }
@@ -346,6 +483,12 @@ def main(argv: Optional[List[str]] = None) -> int:
             receipt_id=args.receipt_id,
             decision_log_id=args.decision_log_id,
         )
+    except ProjectionRejected as exc:
+        if args.decision_log_out:
+            write_json(args.decision_log_out, exc.decision_log)
+            print(f"wrote decision log: {args.decision_log_out}")
+        print(f"projection rejected: {exc}", file=__import__("sys").stderr)
+        return 2
     except ProjectionError as exc:
         print(f"projection rejected: {exc}", file=__import__("sys").stderr)
         return 2
