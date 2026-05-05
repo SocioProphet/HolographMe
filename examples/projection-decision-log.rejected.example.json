@@ -1,0 +1,20 @@
+{
+  "decision_log_id": "pdl_rejected_expired_001",
+  "decisions": [
+    {
+      "decision": "deny",
+      "field": "$request.expires_at",
+      "reason": "consent_policy_expired",
+      "requested_field": "$request"
+    }
+  ],
+  "generated_at": "2026-05-04T18:30:00Z",
+  "mission_id": "mission_agentic_governance_001",
+  "policy_id": "cp_example_alpha",
+  "projection_id": "proj_mission_agentic_governance_001_hdt_example_alpha",
+  "purpose": "mission_fit",
+  "recipient_id": "recipient_socioprophet_consulting",
+  "schema_version": "0.1.0",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha"
+}
