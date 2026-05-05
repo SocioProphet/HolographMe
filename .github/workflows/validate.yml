@@ -40,3 +40,33 @@ jobs:
             --now 2026-05-04T18:30:00Z \
             --receipt-id tr_projection_001 \
             --decision-log-id pdl_projection_001
+
+      - name: Exercise rejected projection CLI decision log
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          consent = json.loads(Path('examples/consent-policy.example.json').read_text())
+          consent['expires_at'] = '2026-05-01T00:00:00Z'
+          Path('generated/expired-consent.json').write_text(json.dumps(consent, indent=2) + '\n')
+          PY
+          set +e
+          python scripts/generate_projection.py \
+            --twin examples/human-digital-twin.example.json \
+            --consent generated/expired-consent.json \
+            --mission examples/mission.example.json \
+            --out generated/rejected-projection.json \
+            --receipt-out generated/rejected-receipt.json \
+            --decision-log-out generated/rejected-decision-log.json \
+            --now 2026-05-04T18:30:00Z \
+            --decision-log-id pdl_rejected_expired_001
+          status=$?
+          set -e
+          test "$status" -eq 2
+          test -f generated/rejected-decision-log.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          log = json.loads(Path('generated/rejected-decision-log.json').read_text())
+          assert log['decisions'][0]['reason'] == 'consent_policy_expired'
+          PY
