@@ -84,6 +84,28 @@ class ProjectionTests(unittest.TestCase):
         Draft202012Validator(receipt_schema).validate(result["receipt"])
         Draft202012Validator(decision_log_schema).validate(result["decision_log"])
 
+    def test_decision_log_records_missing_fields(self):
+        consent = copy.deepcopy(self.consent)
+        consent["allowed_fields"].append("preferences.nonexistent")
+        mission = copy.deepcopy(self.mission)
+        mission["projection_request"]["requested_fields"] = ["preferences.nonexistent"]
+
+        result = generate_projection(
+            self.twin,
+            consent,
+            mission,
+            now="2026-05-04T18:30:00Z",
+            receipt_id="tr_projection_missing_001",
+            decision_log_id="pdl_projection_missing_001",
+        )
+
+        self.assertEqual(
+            result["projection"]["denied_fields"],
+            [{"field": "preferences.nonexistent", "reason": "field_missing_from_twin"}],
+        )
+        self.assertEqual(result["decision_log"]["decisions"][0]["decision"], "deny")
+        self.assertEqual(result["decision_log"]["decisions"][0]["reason"], "field_missing_from_twin")
+
     def test_rejects_expired_consent(self):
         consent = copy.deepcopy(self.consent)
         consent["expires_at"] = "2026-05-01T00:00:00Z"
