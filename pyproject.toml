@@ -1,0 +1,34 @@
+[project]
+name = "holographme"
+version = "0.1.0"
+description = "Self-owned human digital twin governance for agentic work."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "SocioProphet" }
+]
+keywords = [
+  "agentic-work",
+  "digital-twin",
+  "consent",
+  "governance",
+  "workgraph",
+  "staffing"
+]
+dependencies = []
+
+[project.optional-dependencies]
+validation = ["jsonschema>=4.0"]
+test = ["jsonschema>=4.0"]
+
+[project.scripts]
+holographme-generate-projection = "holographme.projection:main"
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["holographme*"]
