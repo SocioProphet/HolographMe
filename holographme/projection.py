@@ -163,6 +163,19 @@ def validate_projection_inputs(
         raise ProjectionError(f"Consent policy expired at {consent['expires_at']}")
 
 
+def make_decision(
+    *,
+    field: str,
+    decision: str,
+    reason: str,
+    requested_field: Optional[str] = None,
+) -> Dict[str, str]:
+    payload = {"field": field, "decision": decision, "reason": reason}
+    if requested_field is not None:
+        payload["requested_field"] = requested_field
+    return payload
+
+
 def generate_projection(
     twin: Mapping[str, Any],
     consent: Mapping[str, Any],
@@ -170,8 +183,9 @@ def generate_projection(
     *,
     now: Optional[str] = None,
     receipt_id: Optional[str] = None,
+    decision_log_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Generate a consent-scoped mission-fit projection and transition receipt."""
+    """Generate a consent-scoped mission-fit projection, receipt, and decision log."""
 
     generated_at = now or now_utc_iso()
     validate_projection_inputs(twin, consent, mission, now=generated_at)
@@ -183,6 +197,7 @@ def generate_projection(
     data: Dict[str, Any] = {}
     exposed_fields: List[str] = []
     denied_fields: List[Dict[str, str]] = []
+    decisions: List[Dict[str, str]] = []
 
     for requested in requested_fields:
         matching_allowed = [
@@ -193,20 +208,58 @@ def generate_projection(
 
         if not matching_allowed:
             denied_fields.append({"field": requested, "reason": "not_allowed_by_consent_policy"})
+            decisions.append(
+                make_decision(
+                    field=requested,
+                    requested_field=requested,
+                    decision="deny",
+                    reason="not_allowed_by_consent_policy",
+                )
+            )
             continue
 
         for allowed in matching_allowed:
+            if is_forbidden(allowed, forbidden_fields):
+                denied_fields.append({"field": allowed, "reason": "forbidden_by_consent_policy"})
+                decisions.append(
+                    make_decision(
+                        field=allowed,
+                        requested_field=requested,
+                        decision="deny",
+                        reason="forbidden_by_consent_policy",
+                    )
+                )
+                continue
+
             patch = project_path(twin, allowed.split("."))
             if patch in (None, {}, []):
                 denied_fields.append({"field": allowed, "reason": "field_missing_from_twin"})
+                decisions.append(
+                    make_decision(
+                        field=allowed,
+                        requested_field=requested,
+                        decision="deny",
+                        reason="field_missing_from_twin",
+                    )
+                )
                 continue
+
             deep_merge(data, patch)
             exposed_fields.append(allowed)
+            decisions.append(
+                make_decision(
+                    field=allowed,
+                    requested_field=requested,
+                    decision="allow",
+                    reason="allowed_by_consent_policy",
+                )
+            )
 
     twin_id = str(twin["twin_id"])
     mission_id = str(mission["mission_id"])
     projection_id = "proj_" + safe_slug(f"{mission_id}_{twin_id}")
     receipt_identifier = receipt_id or "tr_" + safe_slug(f"projection_{mission_id}_{twin_id}")
+    decision_log_identifier = decision_log_id or "pdl_" + safe_slug(f"{mission_id}_{twin_id}")
 
     projection_body = {
         "schema_version": "0.1.0",
@@ -223,6 +276,20 @@ def generate_projection(
         "data": data,
     }
 
+    decision_log = {
+        "schema_version": "0.1.0",
+        "decision_log_id": decision_log_identifier,
+        "projection_id": projection_id,
+        "twin_id": twin_id,
+        "subject_id": twin["subject"]["subject_id"],
+        "mission_id": mission_id,
+        "recipient_id": mission["sponsor"]["recipient_id"],
+        "policy_id": consent["policy_id"],
+        "purpose": mission["projection_request"]["purpose"],
+        "generated_at": generated_at,
+        "decisions": decisions,
+    }
+
     receipt = {
         "schema_version": "0.1.0",
         "receipt_id": receipt_identifier,
@@ -236,7 +303,7 @@ def generate_projection(
         "policy_version": str(consent.get("schema_version", "0.1.0")),
         "previous_state_hash": str(twin.get("state_hash", "sha256:unknown")),
         "new_state_hash": canonical_hash(projection_body),
-        "evidence_links": [consent["policy_id"], mission_id],
+        "evidence_links": [consent["policy_id"], mission_id, decision_log_identifier],
         "approval_band": mission["governance"]["authority_band"],
         "rollback": {
             "rollback_supported": True,
@@ -250,7 +317,7 @@ def generate_projection(
         },
     }
 
-    return {"projection": projection_body, "receipt": receipt}
+    return {"projection": projection_body, "receipt": receipt, "decision_log": decision_log}
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -260,8 +327,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mission", required=True, help="Path to Mission JSON")
     parser.add_argument("--out", required=True, help="Path for projection output JSON")
     parser.add_argument("--receipt-out", required=True, help="Path for transition receipt output JSON")
+    parser.add_argument("--decision-log-out", help="Optional path for projection decision log JSON")
     parser.add_argument("--now", help="Override generation timestamp, ISO-8601 UTC preferred")
     parser.add_argument("--receipt-id", help="Override generated transition receipt id")
+    parser.add_argument("--decision-log-id", help="Override generated projection decision log id")
     return parser
 
 
@@ -275,6 +344,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             load_json(args.mission),
             now=args.now,
             receipt_id=args.receipt_id,
+            decision_log_id=args.decision_log_id,
         )
     except ProjectionError as exc:
         print(f"projection rejected: {exc}", file=__import__("sys").stderr)
@@ -282,8 +352,12 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     write_json(args.out, result["projection"])
     write_json(args.receipt_out, result["receipt"])
+    if args.decision_log_out:
+        write_json(args.decision_log_out, result["decision_log"])
     print(f"wrote projection: {args.out}")
     print(f"wrote receipt: {args.receipt_out}")
+    if args.decision_log_out:
+        print(f"wrote decision log: {args.decision_log_out}")
     return 0
 
 
