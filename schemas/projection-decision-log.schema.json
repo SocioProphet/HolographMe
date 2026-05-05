@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/projection-decision-log.schema.json",
+  "title": "ProjectionDecisionLog",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "decision_log_id",
+    "projection_id",
+    "twin_id",
+    "subject_id",
+    "mission_id",
+    "recipient_id",
+    "policy_id",
+    "purpose",
+    "generated_at",
+    "decisions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "decision_log_id": {"type": "string", "pattern": "^pdl_[a-zA-Z0-9_-]+$"},
+    "projection_id": {"type": "string", "pattern": "^proj_[a-zA-Z0-9_-]+$"},
+    "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+    "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+    "mission_id": {"type": "string", "pattern": "^mission_[a-zA-Z0-9_-]+$"},
+    "recipient_id": {"type": "string"},
+    "policy_id": {"type": "string", "pattern": "^cp_[a-zA-Z0-9_-]+$"},
+    "purpose": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "decision", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "field": {"type": "string"},
+          "requested_field": {"type": "string"},
+          "decision": {"type": "string", "enum": ["allow", "deny"]},
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  }
+}
