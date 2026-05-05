@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1.0",
+  "receipt_id": "tr_initial_001",
+  "twin_id": "hdt_example_alpha",
+  "action": "initial_twin_creation",
+  "actor": {
+    "actor_id": "agent_intake_001",
+    "actor_type": "agent"
+  },
+  "timestamp": "2026-05-04T18:00:00Z",
+  "policy_version": "0.1.0",
+  "previous_state_hash": "sha256:null",
+  "new_state_hash": "sha256:example",
+  "evidence_links": ["ev_repo_001"],
+  "approval_band": "recommend",
+  "rollback": {
+    "rollback_supported": true,
+    "rollback_method": "delete_initial_twin_or_revert_to_prior_export",
+    "irreversible_acknowledged": false
+  },
+  "replay_hints": {
+    "transition_library_version": "0.1.0",
+    "input_snapshot_uri": "urn:example:intake-snapshot:001",
+    "runtime_version": "holographme-bootstrap"
+  }
+}
