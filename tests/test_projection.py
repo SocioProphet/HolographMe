@@ -7,7 +7,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from holographme.projection import ProjectionError, generate_projection
+from holographme.projection import ProjectionError, ProjectionRejected, generate_projection
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -106,41 +106,89 @@ class ProjectionTests(unittest.TestCase):
         self.assertEqual(result["decision_log"]["decisions"][0]["decision"], "deny")
         self.assertEqual(result["decision_log"]["decisions"][0]["reason"], "field_missing_from_twin")
 
-    def test_rejects_expired_consent(self):
+    def test_rejected_expired_consent_has_decision_log(self):
         consent = copy.deepcopy(self.consent)
         consent["expires_at"] = "2026-05-01T00:00:00Z"
 
-        with self.assertRaisesRegex(ProjectionError, "expired"):
+        with self.assertRaisesRegex(ProjectionRejected, "consent_policy_expired") as raised:
             generate_projection(
                 self.twin,
                 consent,
                 self.mission,
                 now="2026-05-04T18:30:00Z",
+                decision_log_id="pdl_rejected_expired_001",
             )
 
-    def test_rejects_mismatched_recipient(self):
+        decision_log = raised.exception.decision_log
+        self.assertEqual(decision_log["decision_log_id"], "pdl_rejected_expired_001")
+        self.assertEqual(decision_log["decisions"][0]["reason"], "consent_policy_expired")
+
+    def test_rejected_mismatched_recipient_has_decision_log(self):
         mission = copy.deepcopy(self.mission)
         mission["sponsor"]["recipient_id"] = "recipient_untrusted"
 
-        with self.assertRaisesRegex(ProjectionError, "not allowed"):
+        with self.assertRaisesRegex(ProjectionRejected, "recipient_not_allowed") as raised:
             generate_projection(
                 self.twin,
                 self.consent,
                 mission,
                 now="2026-05-04T18:30:00Z",
+                decision_log_id="pdl_rejected_recipient_001",
             )
 
-    def test_rejects_mismatched_subject(self):
+        self.assertEqual(raised.exception.decision_log["decisions"][0]["reason"], "recipient_not_allowed")
+
+    def test_rejected_mismatched_subject_has_decision_log(self):
         consent = copy.deepcopy(self.consent)
         consent["subject_id"] = "sub_other"
 
-        with self.assertRaisesRegex(ProjectionError, "subject_id"):
+        with self.assertRaisesRegex(ProjectionRejected, "subject_mismatch") as raised:
             generate_projection(
                 self.twin,
                 consent,
                 self.mission,
                 now="2026-05-04T18:30:00Z",
+                decision_log_id="pdl_rejected_subject_001",
             )
+
+        self.assertEqual(raised.exception.decision_log["decisions"][0]["reason"], "subject_mismatch")
+
+    def test_rejected_purpose_has_decision_log(self):
+        mission = copy.deepcopy(self.mission)
+        mission["projection_request"]["purpose"] = "unapproved_purpose"
+
+        with self.assertRaisesRegex(ProjectionRejected, "purpose_not_allowed") as raised:
+            generate_projection(
+                self.twin,
+                self.consent,
+                mission,
+                now="2026-05-04T18:30:00Z",
+                decision_log_id="pdl_rejected_purpose_001",
+            )
+
+        self.assertEqual(raised.exception.decision_log["decisions"][0]["reason"], "purpose_not_allowed")
+
+    def test_field_forbidden_by_policy_is_logged(self):
+        consent = copy.deepcopy(self.consent)
+        consent["allowed_fields"].append("subject.preferred_contact")
+        consent["forbidden_fields"].append("subject.preferred_contact")
+        mission = copy.deepcopy(self.mission)
+        mission["projection_request"]["requested_fields"] = ["subject.preferred_contact"]
+
+        result = generate_projection(
+            self.twin,
+            consent,
+            mission,
+            now="2026-05-04T18:30:00Z",
+            receipt_id="tr_projection_forbidden_001",
+            decision_log_id="pdl_projection_forbidden_001",
+        )
+
+        self.assertEqual(
+            result["projection"]["denied_fields"],
+            [{"field": "subject.preferred_contact", "reason": "forbidden_by_consent_policy"}],
+        )
+        self.assertEqual(result["decision_log"]["decisions"][0]["reason"], "forbidden_by_consent_policy")
 
 
 if __name__ == "__main__":
