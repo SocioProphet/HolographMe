@@ -41,30 +41,71 @@ HolographMe is designed as the individual-owned primitive inside the broader Soc
 ## Repository contents
 
 ```text
-.github/workflows/validate.yml      Schema validation workflow
+.github/workflows/validate.yml      Schema, runtime, and CLI validation workflow
+holographme/projection.py           Consent-scoped projection runtime
+scripts/generate_projection.py      CLI wrapper for mission-fit projections
+scripts/validate_schemas.py         JSON Schema/example validator
+tests/test_projection.py            Projection runtime tests
+
 docs/product-brief.md               Product and market framing
 docs/architecture.md                System architecture and bounded-control posture
 docs/governance.md                  Consent, ownership, audit, and agentic delegation model
 docs/operating-model.md             Intake-to-mission lifecycle and consulting-agency workflow
+
 schemas/human-digital-twin.schema.json
 schemas/consent-policy.schema.json
 schemas/mission.schema.json
-scripts/validate_schemas.py
+schemas/projection.schema.json
+schemas/transition-receipt.schema.json
+
+examples/human-digital-twin.example.json
+examples/consent-policy.example.json
+examples/mission.example.json
+examples/projection.example.json
+examples/transition-receipt.example.json
 ```
 
-## Initial runtime slice
+## Executable v0.1 slice
 
-The first implementation slice should be narrow:
+The first runtime slice is intentionally narrow:
 
 1. create a human digital twin record;
 2. attach capability claims and evidence;
 3. define a consent policy;
-4. run a competency interview or assessment;
-5. generate a governed mission-fit projection;
-6. emit an auditable state-transition receipt.
+4. request a mission-fit projection;
+5. generate only fields allowed by consent;
+6. deny and explain unauthorized fields;
+7. emit an auditable transition receipt.
 
-This slice is intentionally smaller than the full labor coordination system. It gives the repository an executable bridge without pretending to run the world on day one.
+This slice gives the repository an executable bridge without pretending to run the full labor coordination system on day one.
+
+## Local validation
+
+```bash
+python3 -m pip install --user jsonschema
+python3 scripts/validate_schemas.py
+python3 -m unittest discover -s tests
+```
+
+## Generate a mission-fit projection
+
+```bash
+python3 scripts/generate_projection.py \
+  --twin examples/human-digital-twin.example.json \
+  --consent examples/consent-policy.example.json \
+  --mission examples/mission.example.json \
+  --out generated/projection.json \
+  --receipt-out generated/receipt.json \
+  --now 2026-05-04T18:30:00Z \
+  --receipt-id tr_projection_001
+```
+
+The generated projection includes only consented fields. In the example, `assessments.summary` is requested by the mission but denied because the consent policy does not allow it.
+
+## License
+
+Apache-2.0. See `LICENSE`.
 
 ## Status
 
-This repository is at inception. The immediate objective is to codify the product thesis, governance model, schemas, and first validation harness so implementation can proceed from a clean foundation.
+The repo has crossed from inception docs into the first executable bridge: schemas, examples, validation, a consent-scoped projection runtime, tests, and CI.
