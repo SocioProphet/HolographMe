@@ -36,5 +36,7 @@ jobs:
             --mission examples/mission.example.json \
             --out generated/projection.json \
             --receipt-out generated/receipt.json \
+            --decision-log-out generated/decision-log.json \
             --now 2026-05-04T18:30:00Z \
-            --receipt-id tr_projection_001
+            --receipt-id tr_projection_001 \
+            --decision-log-id pdl_projection_001
