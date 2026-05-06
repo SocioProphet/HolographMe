@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1.0",
+  "feature_id": "tpf_proj_mission_fit_001_capability_claims_capability",
+  "projection_id": "proj_mission_fit_001",
+  "twin_id": "hdt_example_001",
+  "subject_id": "sub_example_001",
+  "mission_id": "mission_agentic_data_platform_001",
+  "recipient_id": "client_example_001",
+  "feature_family": "capability",
+  "feature_name": "capability_claims.capability",
+  "feature_value": {
+    "capability_claims": [
+      {
+        "capability": "Agentic systems design"
+      }
+    ]
+  },
+  "feature_confidence": "medium",
+  "source_field_path": "capability_claims.capability",
+  "source_field_decision": "allow",
+  "source_field_reason": "allowed_by_consent_policy",
+  "denial_reason_visibility": "safe_reason_only",
+  "domain_context": {
+    "domain_id": "holographme.mission_projection",
+    "source_modality": "structured_human_digital_twin_projection",
+    "calibration_state": "in_domain"
+  },
+  "consent_scope_snapshot": {
+    "policy_id": "cp_example_001",
+    "recipient_id": "client_example_001",
+    "purpose": "mission_fit",
+    "expires_at": "2026-06-01T00:00:00Z",
+    "retention_rule": "mission_scope_only"
+  },
+  "mission_governance_snapshot": {
+    "mission_id": "mission_agentic_data_platform_001",
+    "authority_band": "recommend",
+    "audit_required": true,
+    "human_approval_required": true,
+    "conformance_tags": ["mission_fit"]
+  },
+  "transition_receipt_ref": {
+    "receipt_id": "tr_projection_001",
+    "twin_id": "hdt_example_001",
+    "action": "mission_fit_projection",
+    "approval_band": "recommend"
+  },
+  "projection_decision_log_ref": {
+    "schema_version": "0.1.0",
+    "decision_log_id": "pdl_projection_001",
+    "projection_id": "proj_mission_fit_001",
+    "twin_id": "hdt_example_001",
+    "subject_id": "sub_example_001",
+    "mission_id": "mission_agentic_data_platform_001",
+    "recipient_id": "client_example_001",
+    "policy_id": "cp_example_001",
+    "purpose": "mission_fit",
+    "generated_at": "2026-05-04T18:30:00Z"
+  },
+  "retention_rule": "mission_scope_only",
+  "revocation_state": "active",
+  "effective_authority_band": "recommend",
+  "policy_state": "allowed",
+  "created_at": "2026-05-04T18:31:00Z"
+}
