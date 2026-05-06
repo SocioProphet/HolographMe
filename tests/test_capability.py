@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 from holographme.capability import (
     CapabilityEventError,
     append_claim_event,
+    append_claim_event_with_receipt,
     apply_event_log_to_twin,
     claim_state_from_events,
     validate_transition,
@@ -51,6 +52,36 @@ class CapabilityEventTests(unittest.TestCase):
         self.assertEqual(claim["claim_id"], "claim_agentic_systems_001")
         self.assertEqual(claim["verification_status"], "verified")
         self.assertEqual(claim["confidence"], "high")
+
+    def test_append_event_with_receipt_and_twin_update(self):
+        event = load_json(EXAMPLES / "capability-claim-event.append.example.json")
+        result = append_claim_event_with_receipt(
+            self.twin,
+            self.event_log,
+            event,
+            receipt_id="tr_ccev_claim_expired_001",
+            apply_to_twin=True,
+        )
+
+        updated_log = result["event_log"]
+        receipt = result["receipt"]
+        updated_twin = result["twin"]
+
+        self.assertEqual(updated_log["events"][-1]["event_id"], "ccev_claim_expired_001")
+        self.assertEqual(claim_state_from_events(updated_log)["verification_status"], "expired")
+        self.assertEqual(receipt["action"], "capability_claim_event_appended")
+        self.assertEqual(receipt["details"]["claim_id"], "claim_agentic_systems_001")
+        self.assertEqual(receipt["details"]["event_id"], "ccev_claim_expired_001")
+        self.assertEqual(receipt["details"]["status_before"], "verified")
+        self.assertEqual(receipt["details"]["status_after"], "expired")
+        self.assertEqual(updated_twin["capability_claims"][0]["verification_status"], "expired")
+
+        event_log_schema = load_json(SCHEMAS / "capability-claim-event.schema.json")
+        receipt_schema = load_json(SCHEMAS / "transition-receipt.schema.json")
+        twin_schema = load_json(SCHEMAS / "human-digital-twin.schema.json")
+        Draft202012Validator(event_log_schema).validate(updated_log)
+        Draft202012Validator(receipt_schema).validate(receipt)
+        Draft202012Validator(twin_schema).validate(updated_twin)
 
     def test_append_retirement_event(self):
         retirement_event = {
@@ -120,6 +151,14 @@ class CapabilityEventTests(unittest.TestCase):
 
         with self.assertRaisesRegex(CapabilityEventError, "status_before"):
             append_claim_event(self.event_log, event)
+
+    def test_rejects_twin_claim_mismatch(self):
+        twin = copy.deepcopy(self.twin)
+        twin["capability_claims"] = []
+        event = load_json(EXAMPLES / "capability-claim-event.append.example.json")
+
+        with self.assertRaisesRegex(CapabilityEventError, "claim not found"):
+            append_claim_event_with_receipt(twin, self.event_log, event)
 
 
 if __name__ == "__main__":
