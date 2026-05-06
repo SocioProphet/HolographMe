@@ -1,0 +1,58 @@
+{
+  "claim_id": "claim_agentic_systems_001",
+  "event_log_id": "cce_claim_agentic_systems_001",
+  "events": [
+    {
+      "actor": {
+        "actor_id": "sub_example_alpha",
+        "actor_type": "subject"
+      },
+      "confidence_after": "low",
+      "event_id": "ccev_claim_created_001",
+      "event_type": "claim_created",
+      "evidence_ids": [],
+      "status_after": "self_attested",
+      "summary": "Subject created an initial capability claim for agentic systems design.",
+      "timestamp": "2026-05-04T18:00:00Z"
+    },
+    {
+      "actor": {
+        "actor_id": "agent_intake_001",
+        "actor_type": "agent"
+      },
+      "confidence_after": "medium",
+      "confidence_before": "low",
+      "event_id": "ccev_evidence_attached_001",
+      "event_type": "evidence_attached",
+      "evidence_ids": [
+        "ev_repo_001"
+      ],
+      "receipt_id": "tr_initial_001",
+      "status_after": "evidence_attached",
+      "status_before": "self_attested",
+      "summary": "Repository evidence was attached during intake review.",
+      "timestamp": "2026-05-04T18:05:00Z"
+    },
+    {
+      "actor": {
+        "actor_id": "operator_governance_001",
+        "actor_type": "operator"
+      },
+      "confidence_after": "high",
+      "confidence_before": "medium",
+      "event_id": "ccev_review_recorded_001",
+      "event_type": "review_recorded",
+      "evidence_ids": [
+        "ev_repo_001"
+      ],
+      "receipt_id": "tr_initial_001",
+      "status_after": "verified",
+      "status_before": "evidence_attached",
+      "summary": "Governance operator reviewed evidence and marked the claim verified for bounded mission-fit use.",
+      "timestamp": "2026-05-04T18:20:00Z"
+    }
+  ],
+  "schema_version": "0.1.0",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha"
+}
