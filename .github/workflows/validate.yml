@@ -25,7 +25,7 @@ jobs:
       - name: Validate JSON Schemas and examples
         run: python scripts/validate_schemas.py
 
-      - name: Run projection runtime tests
+      - name: Run runtime tests
         run: python -m unittest discover -s tests
 
       - name: Exercise projection CLI
@@ -70,3 +70,47 @@ jobs:
           log = json.loads(Path('generated/rejected-decision-log.json').read_text())
           assert log['decisions'][0]['reason'] == 'consent_policy_expired'
           PY
+
+      - name: Exercise capability event CLI
+        run: |
+          python scripts/capability_event.py \
+            --twin examples/human-digital-twin.example.json \
+            --event-log examples/capability-claim-event.example.json \
+            --event examples/capability-claim-event.append.example.json \
+            --out generated/capability-event-log.json \
+            --receipt-out generated/capability-receipt.json \
+            --twin-out generated/capability-twin.json \
+            --receipt-id tr_ccev_claim_expired_001
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          log = json.loads(Path('generated/capability-event-log.json').read_text())
+          receipt = json.loads(Path('generated/capability-receipt.json').read_text())
+          twin = json.loads(Path('generated/capability-twin.json').read_text())
+          assert log['events'][-1]['event_id'] == 'ccev_claim_expired_001'
+          assert receipt['details']['claim_id'] == 'claim_agentic_systems_001'
+          assert receipt['details']['event_id'] == 'ccev_claim_expired_001'
+          assert receipt['details']['status_after'] == 'expired'
+          assert twin['capability_claims'][0]['verification_status'] == 'expired'
+          PY
+
+      - name: Exercise rejected capability event CLI
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          event = json.loads(Path('examples/capability-claim-event.append.example.json').read_text())
+          event['event_id'] = 'ccev_bad_before_001'
+          event['status_before'] = 'self_attested'
+          Path('generated/bad-capability-event.json').write_text(json.dumps(event, indent=2) + '\n')
+          PY
+          set +e
+          python scripts/capability_event.py \
+            --twin examples/human-digital-twin.example.json \
+            --event-log examples/capability-claim-event.example.json \
+            --event generated/bad-capability-event.json \
+            --out generated/bad-capability-event-log.json \
+            --receipt-out generated/bad-capability-receipt.json
+          status=$?
+          set -e
+          test "$status" -eq 2
