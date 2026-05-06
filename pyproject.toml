@@ -25,6 +25,7 @@ test = ["jsonschema>=4.0"]
 [project.scripts]
 holographme-generate-projection = "holographme.projection:main"
 holographme-capability-event = "holographme.capability:main"
+holographme-bundle-manifest = "holographme.bundle:main"
 
 [build-system]
 requires = ["setuptools>=69", "wheel"]
