@@ -25,6 +25,21 @@
     "new_state_hash": {"type": "string"},
     "evidence_links": {"type": "array", "items": {"type": "string"}},
     "approval_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
+    "details": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {"type": "string", "pattern": "^claim_[a-zA-Z0-9_-]+$"},
+        "event_id": {"type": "string", "pattern": "^ccev_[a-zA-Z0-9_-]+$"},
+        "event_type": {"type": "string"},
+        "status_before": {"type": "string"},
+        "status_after": {"type": "string"},
+        "confidence_before": {"type": "string"},
+        "confidence_after": {"type": "string"},
+        "projection_id": {"type": "string", "pattern": "^proj_[a-zA-Z0-9_-]+$"},
+        "decision_log_id": {"type": "string", "pattern": "^pdl_[a-zA-Z0-9_-]+$"}
+      }
+    },
     "rollback": {
       "type": "object",
       "additionalProperties": false,
