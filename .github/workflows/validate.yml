@@ -8,7 +8,7 @@ on:
 
 jobs:
   schemas-and-runtime:
-    name: Validate schemas, examples, and projection runtime
+    name: Validate schemas, examples, and runtime CLIs
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -111,6 +111,44 @@ jobs:
             --event generated/bad-capability-event.json \
             --out generated/bad-capability-event-log.json \
             --receipt-out generated/bad-capability-receipt.json
+          status=$?
+          set -e
+          test "$status" -eq 2
+
+      - name: Exercise export bundle manifest CLI
+        run: |
+          python scripts/bundle_manifest.py \
+            --bundle-id bundle_ci_alpha \
+            --created-at 2026-05-05T18:30:00Z \
+            --custodian "SocioProphet HolographMe" \
+            --root . \
+            --artifact human-digital-twin=examples/human-digital-twin.example.json \
+            --artifact consent-policy=examples/consent-policy.example.json \
+            --artifact mission=examples/mission.example.json \
+            --artifact projection=examples/projection.example.json \
+            --artifact projection-decision-log=examples/projection-decision-log.example.json \
+            --artifact capability-claim-event-log=examples/capability-claim-event.example.json \
+            --artifact transition-receipt=examples/transition-receipt.example.json \
+            --out generated/export-bundle-manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest = json.loads(Path('generated/export-bundle-manifest.json').read_text())
+          assert manifest['bundle_id'] == 'bundle_ci_alpha'
+          assert manifest['twin_id'] == 'hdt_example_alpha'
+          assert manifest['subject_id'] == 'sub_example_alpha'
+          assert manifest['artifact_count'] == 7
+          assert manifest['bundle_digest'].startswith('sha256:')
+          assert manifest['artifacts'][0]['digest'].startswith('sha256:')
+          PY
+
+      - name: Exercise rejected export bundle manifest CLI
+        run: |
+          set +e
+          python scripts/bundle_manifest.py \
+            --bundle-id bundle_missing \
+            --artifact human-digital-twin=examples/missing-human-digital-twin.json \
+            --out generated/missing-bundle.json
           status=$?
           set -e
           test "$status" -eq 2
