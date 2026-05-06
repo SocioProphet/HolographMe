@@ -12,8 +12,8 @@ The system must prevent a human digital twin from becoming a platform-owned doss
 2. External parties receive scoped projections, not unrestricted access.
 3. Consent must be purpose-bound, time-bound, revocable, and auditable.
 4. Agentic delegation must declare authority limits.
-5. Capability claims must preserve evidence and confidence posture.
-6. Major state transitions must emit receipts.
+5. Capability claims must preserve evidence, confidence posture, and event history.
+6. Major state transitions must emit receipts or decision logs.
 7. High-impact actions require human approval unless explicitly pre-authorized.
 8. Revocation must be a first-class operation.
 9. Sensitive fields require explicit exposure rules.
@@ -47,6 +47,8 @@ Examples:
 - `client_delivery_projection`: shows role, capability, credentials, and engagement-specific identity details.
 - `agent_delegate_projection`: shows only the fields an authorized agent needs to represent the person under a specific delegation.
 
+Every projection attempt should have an auditable decision record. A successful projection records allowed, denied, missing, and forbidden fields. A rejected projection records request-level denial reasons such as expired consent, mismatched subject, unapproved recipient, or unapproved purpose.
+
 ## Agentic delegation
 
 Delegation should be explicit and granular.
@@ -61,6 +63,25 @@ Delegation should be explicit and granular.
 | Negotiate rate or terms | Human review required unless pre-authorized. |
 | Accept work | Human approval required by default. |
 | Disclose sensitive attributes | Explicit approval required. |
+
+Delegation is executable, not merely descriptive. A delegated agent must be listed on the twin, the requested action must be allowed, the delegation must be unexpired, and the granted authority band must satisfy the required action band.
+
+## Capability claim lifecycle
+
+Capability claims are not permanent truth. They are current-state summaries derived from event history.
+
+A claim can move through these statuses:
+
+- `self_attested`: the subject asserted the capability.
+- `evidence_attached`: evidence exists, but it is not yet verified.
+- `verified`: an authorized review has accepted the claim for bounded use.
+- `disputed`: a subject, reviewer, client, or governance actor challenged the claim.
+- `expired`: evidence or verification aged out and needs renewal.
+- `retired`: the subject or governance process removed the claim from active use.
+
+Status transitions should be recorded as capability claim events. Events include claim creation, evidence attachment, review, status change, expiration, and retirement. Retired claims are terminal: they may remain in history, but they should not be revived silently for mission-fit use.
+
+This rule prevents old assessments from becoming permanent automated scars and prevents stale claims from being treated as fresh capability.
 
 ## Transition receipts
 
@@ -115,4 +136,4 @@ The governance layer should be capable of answering:
 
 ## First conformance target
 
-The initial repo conformance target is modest: schemas, examples, and validation. A valid HolographMe object must be parseable, consent-scoped, and auditable enough to support a mission-fit projection without leaking the full twin.
+The initial repo conformance target is modest: schemas, examples, validation, event logs, and bounded runtimes. A valid HolographMe object must be parseable, consent-scoped, and auditable enough to support a mission-fit projection without leaking the full twin.
