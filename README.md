@@ -43,9 +43,14 @@ HolographMe is designed as the individual-owned primitive inside the broader Soc
 ```text
 .github/workflows/validate.yml      Schema, runtime, and CLI validation workflow
 holographme/projection.py           Consent-scoped projection runtime
+holographme/delegation.py           Delegated-agent permission checks
+holographme/capability.py           Capability-claim event lifecycle runtime
 scripts/generate_projection.py      CLI wrapper for mission-fit projections
+scripts/capability_event.py         CLI wrapper for capability-claim events
 scripts/validate_schemas.py         JSON Schema/example validator
 tests/test_projection.py            Projection runtime tests
+tests/test_delegation.py            Delegation runtime tests
+tests/test_capability.py            Capability event runtime tests
 
 docs/product-brief.md               Product and market framing
 docs/architecture.md                System architecture and bounded-control posture
@@ -56,28 +61,46 @@ schemas/human-digital-twin.schema.json
 schemas/consent-policy.schema.json
 schemas/mission.schema.json
 schemas/projection.schema.json
+schemas/projection-decision-log.schema.json
+schemas/capability-claim-event.schema.json
 schemas/transition-receipt.schema.json
 
 examples/human-digital-twin.example.json
 examples/consent-policy.example.json
 examples/mission.example.json
 examples/projection.example.json
+examples/projection-decision-log.example.json
+examples/projection-decision-log.rejected.example.json
+examples/capability-claim-event.example.json
+examples/capability-claim-event.append.example.json
 examples/transition-receipt.example.json
 ```
 
-## Executable v0.1 slice
+## Executable slices
 
-The first runtime slice is intentionally narrow:
+### Mission-fit projection
 
-1. create a human digital twin record;
-2. attach capability claims and evidence;
-3. define a consent policy;
-4. request a mission-fit projection;
-5. generate only fields allowed by consent;
-6. deny and explain unauthorized fields;
-7. emit an auditable transition receipt.
+The projection slice:
 
-This slice gives the repository an executable bridge without pretending to run the full labor coordination system on day one.
+1. reads a human digital twin, consent policy, and mission;
+2. generates only fields allowed by consent;
+3. denies and explains unauthorized, missing, forbidden, or request-level rejected fields;
+4. emits a mission-fit projection;
+5. emits a projection decision log;
+6. emits a transition receipt.
+
+### Capability-claim lifecycle
+
+The capability slice:
+
+1. reads a human digital twin, capability event log, and new capability event;
+2. validates legal lifecycle transitions;
+3. rejects illegal status changes and duplicate event ids;
+4. appends the event to the event log;
+5. optionally writes an updated twin copy with derived claim status;
+6. emits a transition receipt with claim id, event id, previous status, and new status.
+
+Capability claims are not permanent truth. They are current-state summaries derived from auditable event history.
 
 ## Local validation
 
@@ -96,11 +119,26 @@ python3 scripts/generate_projection.py \
   --mission examples/mission.example.json \
   --out generated/projection.json \
   --receipt-out generated/receipt.json \
+  --decision-log-out generated/decision-log.json \
   --now 2026-05-04T18:30:00Z \
-  --receipt-id tr_projection_001
+  --receipt-id tr_projection_001 \
+  --decision-log-id pdl_projection_001
 ```
 
 The generated projection includes only consented fields. In the example, `assessments.summary` is requested by the mission but denied because the consent policy does not allow it.
+
+## Append a capability-claim event
+
+```bash
+python3 scripts/capability_event.py \
+  --twin examples/human-digital-twin.example.json \
+  --event-log examples/capability-claim-event.example.json \
+  --event examples/capability-claim-event.append.example.json \
+  --out generated/capability-event-log.json \
+  --receipt-out generated/capability-receipt.json \
+  --twin-out generated/capability-twin.json \
+  --receipt-id tr_ccev_claim_expired_001
+```
 
 ## License
 
@@ -108,4 +146,4 @@ Apache-2.0. See `LICENSE`.
 
 ## Status
 
-The repo has crossed from inception docs into the first executable bridge: schemas, examples, validation, a consent-scoped projection runtime, tests, and CI.
+The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI.
