@@ -90,7 +90,7 @@
         "claim_id": {"type": "string", "pattern": "^claim_[a-zA-Z0-9_-]+$"},
         "capability": {"type": "string", "minLength": 1},
         "level": {"type": "string", "enum": ["awareness", "apprentice", "practitioner", "lead", "expert"]},
-        "verification_status": {"type": "string", "enum": ["self_attested", "evidence_attached", "verified", "disputed", "expired"]},
+        "verification_status": {"type": "string", "enum": ["self_attested", "evidence_attached", "verified", "disputed", "expired", "retired"]},
         "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
         "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_artifact"}}
       }
