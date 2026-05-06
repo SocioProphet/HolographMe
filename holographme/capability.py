@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import argparse
 import copy
 import hashlib
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 
@@ -30,6 +32,22 @@ LEGAL_TRANSITIONS = {
 
 RETIREABLE_STATUSES = {"self_attested", "evidence_attached", "verified", "disputed", "expired"}
 EXPIRABLE_STATUSES = {"self_attested", "evidence_attached", "verified", "disputed"}
+
+
+def load_json(path: str | Path) -> Dict[str, Any]:
+    with Path(path).open("r", encoding="utf-8") as handle:
+        value = json.load(handle)
+    if not isinstance(value, dict):
+        raise CapabilityEventError(f"Expected JSON object in {path}")
+    return value
+
+
+def write_json(path: str | Path, value: Mapping[str, Any]) -> None:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("w", encoding="utf-8") as handle:
+        json.dump(value, handle, indent=2, sort_keys=True)
+        handle.write("\n")
 
 
 def canonical_hash(value: Any) -> str:
@@ -230,3 +248,47 @@ def apply_event_log_to_twin(twin: Mapping[str, Any], event_log: Mapping[str, Any
         return updated
 
     raise CapabilityEventError(f"claim not found in twin: {claim_id}")
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Append a HolographMe capability claim event.")
+    parser.add_argument("--twin", required=True, help="Path to HumanDigitalTwin JSON")
+    parser.add_argument("--event-log", required=True, help="Path to CapabilityClaimEventLog JSON")
+    parser.add_argument("--event", required=True, help="Path to capability claim event JSON")
+    parser.add_argument("--out", required=True, help="Path for updated event log JSON")
+    parser.add_argument("--receipt-out", required=True, help="Path for transition receipt JSON")
+    parser.add_argument("--twin-out", help="Optional path for updated twin JSON")
+    parser.add_argument("--receipt-id", help="Override generated transition receipt id")
+    parser.add_argument("--approval-band", choices=["observe", "recommend", "represent", "negotiate", "commit"], help="Override receipt approval band")
+    return parser
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    args = build_arg_parser().parse_args(argv)
+
+    try:
+        result = append_claim_event_with_receipt(
+            load_json(args.twin),
+            load_json(args.event_log),
+            load_json(args.event),
+            receipt_id=args.receipt_id,
+            approval_band=args.approval_band,
+            apply_to_twin=args.twin_out is not None,
+        )
+    except CapabilityEventError as exc:
+        print(f"capability event rejected: {exc}", file=__import__("sys").stderr)
+        return 2
+
+    write_json(args.out, result["event_log"])
+    write_json(args.receipt_out, result["receipt"])
+    if args.twin_out:
+        write_json(args.twin_out, result["twin"])
+    print(f"wrote event log: {args.out}")
+    print(f"wrote receipt: {args.receipt_out}")
+    if args.twin_out:
+        print(f"wrote twin: {args.twin_out}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
