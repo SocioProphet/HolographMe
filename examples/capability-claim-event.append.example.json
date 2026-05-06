@@ -1,0 +1,14 @@
+{
+  "actor": {
+    "actor_id": "operator_governance_001",
+    "actor_type": "operator"
+  },
+  "confidence_after": "high",
+  "confidence_before": "high",
+  "event_id": "ccev_claim_expired_001",
+  "event_type": "claim_expired",
+  "status_after": "expired",
+  "status_before": "verified",
+  "summary": "Governance review marked this claim stale until refreshed evidence is attached.",
+  "timestamp": "2026-05-05T18:00:00Z"
+}
