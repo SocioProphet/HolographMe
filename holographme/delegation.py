@@ -14,6 +14,16 @@ AUTHORITY_ORDER = {
     "commit": 4,
 }
 
+OPERATION_TYPES = {
+    "human_profile.create",
+    "human_competency.verify",
+    "human_delegation.grant",
+    "human_delegation.revoke",
+    "staffing.assignment.propose",
+    "staffing.assignment.accept",
+    "identity.claim.review",
+}
+
 
 def parse_instant(value: str) -> datetime:
     if value.endswith("Z"):
@@ -72,6 +82,11 @@ def check_delegation(
         decision["reason"] = "agent_not_delegated"
         return decision
 
+    if delegation.get("status") == "revoked":
+        decision["reason"] = "delegation_revoked"
+        decision["revoked_at"] = delegation.get("revoked_at")
+        return decision
+
     expires_at = delegation.get("expires_at")
     if expires_at is not None:
         check_time = parse_instant(now or now_utc_iso())
@@ -101,3 +116,46 @@ def check_delegation(
         }
     )
     return decision
+
+
+def check_agent_operation_authority(
+    twin: Mapping[str, Any],
+    *,
+    agent_id: str,
+    operation_type: str,
+    required_band: str,
+    policy_fabric_allowed: bool,
+    agent_registry_allowed: bool,
+    now: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Check acting-for-human authority with policy and registry gates."""
+
+    decision: Dict[str, Any] = {
+        "agent_id": agent_id,
+        "operation_type": operation_type,
+        "required_band": required_band,
+        "allowed": False,
+        "reason": "unknown",
+    }
+
+    if operation_type not in OPERATION_TYPES:
+        decision["reason"] = "unsupported_operation_type"
+        return decision
+
+    if not policy_fabric_allowed:
+        decision["reason"] = "policy_fabric_check_required"
+        return decision
+
+    if not agent_registry_allowed:
+        decision["reason"] = "agent_registry_check_required"
+        return decision
+
+    delegation_decision = check_delegation(
+        twin,
+        agent_id=agent_id,
+        requested_action=operation_type,
+        required_band=required_band,
+        now=now,
+    )
+    delegation_decision["operation_type"] = operation_type
+    return delegation_decision

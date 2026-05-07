@@ -63,6 +63,7 @@ schemas/mission.schema.json
 schemas/projection.schema.json
 schemas/projection-decision-log.schema.json
 schemas/capability-claim-event.schema.json
+schemas/labor-coordination-record.schema.json
 schemas/transition-receipt.schema.json
 
 examples/human-digital-twin.example.json
@@ -73,6 +74,7 @@ examples/projection-decision-log.example.json
 examples/projection-decision-log.rejected.example.json
 examples/capability-claim-event.example.json
 examples/capability-claim-event.append.example.json
+examples/labor-coordination-record.example.json
 examples/transition-receipt.example.json
 ```
 
