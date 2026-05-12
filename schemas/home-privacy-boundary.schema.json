@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/home-privacy-boundary.schema.json",
+  "title": "HomePrivacyBoundary",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "boundary_id",
+    "subject_id",
+    "scope",
+    "data_boundaries",
+    "retention",
+    "sharing",
+    "audit"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "boundary_id": {"type": "string", "pattern": "^hpb_[a-zA-Z0-9_-]+$"},
+    "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+    "household_id": {"type": "string", "pattern": "^hh_[a-zA-Z0-9_-]+$"},
+    "scope": {
+      "type": "object",
+      "required": ["physical_contexts", "device_types", "purposes"],
+      "additionalProperties": false,
+      "properties": {
+        "physical_contexts": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "device_types": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "data_attributes": {"type": "array", "items": {"type": "string"}},
+        "purposes": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "ontogenesis_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "data_boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/data_boundary"}
+    },
+    "retention": {
+      "type": "object",
+      "required": ["default_posture", "max_duration", "cloud_retention_allowed"],
+      "additionalProperties": false,
+      "properties": {
+        "default_posture": {"type": "string", "enum": ["deny", "allow", "review_required"]},
+        "max_duration": {"type": "string"},
+        "cloud_retention_allowed": {"type": "boolean"},
+        "local_retention_allowed": {"type": "boolean"},
+        "deletion_required_on_revocation": {"type": "boolean"}
+      }
+    },
+    "sharing": {
+      "type": "object",
+      "required": ["default_posture", "allowed_recipients", "forbidden_recipients"],
+      "additionalProperties": false,
+      "properties": {
+        "default_posture": {"type": "string", "enum": ["deny", "allow", "review_required"]},
+        "allowed_recipients": {"type": "array", "items": {"type": "string"}},
+        "forbidden_recipients": {"type": "array", "items": {"type": "string"}},
+        "explicit_consent_required_for": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agents_allowed": {"type": "boolean"},
+        "allowed_agent_actions": {"type": "array", "items": {"type": "string"}},
+        "max_authority_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
+        "requires_human_review_for": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "risk_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sensitivity_tier": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+        "risk_inferences": {"type": "array", "items": {"type": "string"}},
+        "notes": {"type": "string"}
+      }
+    },
+    "evidence_bindings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_binding"}
+    },
+    "audit": {
+      "type": "object",
+      "required": ["log_access", "emit_receipts", "notify_subject"],
+      "additionalProperties": false,
+      "properties": {
+        "log_access": {"type": "boolean"},
+        "emit_receipts": {"type": "boolean"},
+        "notify_subject": {"type": "boolean"},
+        "receipt_ids": {"type": "array", "items": {"type": "string", "pattern": "^tr_[a-zA-Z0-9_-]+$"}}
+      }
+    },
+    "expires_at": {"type": "string", "format": "date-time"},
+    "state_hash": {"type": "string"}
+  },
+  "$defs": {
+    "data_boundary": {
+      "type": "object",
+      "required": ["data_attribute", "default_action", "allowed_purposes"],
+      "additionalProperties": false,
+      "properties": {
+        "data_attribute": {"type": "string"},
+        "physical_context": {"type": "string"},
+        "default_action": {"type": "string", "enum": ["allow", "deny", "review_required", "local_only"]},
+        "allowed_purposes": {"type": "array", "items": {"type": "string"}},
+        "forbidden_purposes": {"type": "array", "items": {"type": "string"}},
+        "requires_explicit_consent": {"type": "boolean"}
+      }
+    },
+    "evidence_binding": {
+      "type": "object",
+      "required": ["evidence_id", "source_type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^ev_[a-zA-Z0-9_-]+$"},
+        "source_type": {"type": "string", "enum": ["ontogenesis", "gaia", "sourceos", "policy", "manual", "other"]},
+        "description": {"type": "string"},
+        "uri": {"type": "string"},
+        "digest": {"type": "string"},
+        "observed_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}
