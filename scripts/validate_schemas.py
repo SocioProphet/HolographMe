@@ -22,6 +22,7 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "projection-decision-log.rejected.example.json": "projection-decision-log.schema.json",
     "capability-claim-event.example.json": "capability-claim-event.schema.json",
     "export-bundle-manifest.example.json": "export-bundle-manifest.schema.json",
+    "home-privacy-boundary.example.json": "home-privacy-boundary.schema.json",
 }
 
 
