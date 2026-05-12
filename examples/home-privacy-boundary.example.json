@@ -1,0 +1,88 @@
+{
+  "schema_version": "0.1.0",
+  "boundary_id": "hpb_nursery_baby_monitor_default",
+  "subject_id": "sub_example_worker",
+  "household_id": "hh_example_home",
+  "scope": {
+    "physical_contexts": [
+      "https://socioprophet.github.io/ontogenesis/domains/smart-home-privacy#NurseryContext"
+    ],
+    "device_types": [
+      "https://socioprophet.github.io/ontogenesis/domains/smart-home-privacy#BabyMonitor"
+    ],
+    "data_attributes": [
+      "https://socioprophet.github.io/ontogenesis/domains/smart-home-privacy#VideoStream",
+      "https://socioprophet.github.io/ontogenesis/domains/smart-home-privacy#AudioStream"
+    ],
+    "purposes": [
+      "local_child_safety_monitoring"
+    ],
+    "ontogenesis_refs": [
+      "Domains/smart-home-privacy.ttl",
+      "shapes/smart-home-privacy.shacl.ttl"
+    ]
+  },
+  "data_boundaries": [
+    {
+      "data_attribute": "VideoStream",
+      "physical_context": "NurseryContext",
+      "default_action": "local_only",
+      "allowed_purposes": ["local_child_safety_monitoring"],
+      "forbidden_purposes": ["behavioral_advertising", "insurance_underwriting", "landlord_monitoring"],
+      "requires_explicit_consent": true
+    },
+    {
+      "data_attribute": "AudioStream",
+      "physical_context": "NurseryContext",
+      "default_action": "local_only",
+      "allowed_purposes": ["local_child_safety_monitoring"],
+      "forbidden_purposes": ["behavioral_advertising", "insurance_underwriting", "landlord_monitoring"],
+      "requires_explicit_consent": true
+    }
+  ],
+  "retention": {
+    "default_posture": "deny",
+    "max_duration": "session_only_unless_explicitly_authorized",
+    "cloud_retention_allowed": false,
+    "local_retention_allowed": true,
+    "deletion_required_on_revocation": true
+  },
+  "sharing": {
+    "default_posture": "deny",
+    "allowed_recipients": ["subject_guardian", "household_authorized_caregiver"],
+    "forbidden_recipients": ["insurer", "landlord", "employer", "advertising_network", "unscoped_third_party"],
+    "explicit_consent_required_for": ["cloud_service_provider", "law_enforcement_request", "support_diagnostics"]
+  },
+  "delegation": {
+    "agents_allowed": true,
+    "allowed_agent_actions": ["observe_policy_posture", "recommend_settings", "emit_warning"],
+    "max_authority_band": "recommend",
+    "requires_human_review_for": ["share", "retain_in_cloud", "grant_third_party_access"]
+  },
+  "risk_posture": {
+    "sensitivity_tier": "critical",
+    "risk_inferences": [
+      "ChildSurveillanceRisk",
+      "OccupancyInferenceRisk",
+      "ScheduleInferenceRisk"
+    ],
+    "notes": "Nursery audio/video is materially different from generic camera video and must not be collapsed into an undifferentiated video category."
+  },
+  "evidence_bindings": [
+    {
+      "evidence_id": "ev_ontogenesis_smart_home_privacy_001",
+      "source_type": "ontogenesis",
+      "description": "Ontogenesis smart-home privacy domain pack defines BabyMonitor, NurseryContext, VideoStream, AudioStream, and ChildSurveillanceRisk.",
+      "uri": "https://github.com/SocioProphet/ontogenesis/blob/feat/smart-home-privacy-domain/Domains/smart-home-privacy.ttl",
+      "observed_at": "2026-05-12T00:00:00Z"
+    }
+  ],
+  "audit": {
+    "log_access": true,
+    "emit_receipts": true,
+    "notify_subject": true,
+    "receipt_ids": ["tr_home_privacy_boundary_example_001"]
+  },
+  "expires_at": "2027-05-12T00:00:00Z",
+  "state_hash": "example-not-a-production-hash"
+}
