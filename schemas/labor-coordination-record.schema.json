@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/labor-coordination-record.schema.json",
+  "title": "LaborCoordinationRecord",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "record_id",
+    "twin_id",
+    "subject_id",
+    "operation_type",
+    "timestamp",
+    "authority_boundary",
+    "artifacts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "record_id": {"type": "string", "pattern": "^lcr_[a-zA-Z0-9_-]+$"},
+    "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+    "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+    "operation_type": {
+      "type": "string",
+      "enum": [
+        "human_profile.create",
+        "human_competency.verify",
+        "human_delegation.grant",
+        "human_delegation.revoke",
+        "staffing.assignment.propose",
+        "staffing.assignment.accept",
+        "identity.claim.review"
+      ]
+    },
+    "timestamp": {"type": "string", "format": "date-time"},
+    "decision_card": {
+      "type": "object",
+      "required": ["decision_card_id", "status", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "decision_card_id": {"type": "string", "pattern": "^dc_[a-zA-Z0-9_-]+$"},
+        "status": {"type": "string", "enum": ["proposed", "accepted", "rejected"]},
+        "summary": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority_boundary": {
+      "type": "object",
+      "required": ["delegation_check", "policy_fabric_check", "agent_registry_check"],
+      "additionalProperties": false,
+      "properties": {
+        "delegation_check": {"$ref": "#/$defs/boundary_check"},
+        "policy_fabric_check": {"$ref": "#/$defs/boundary_check"},
+        "agent_registry_check": {"$ref": "#/$defs/boundary_check"}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "HumanDigitalTwinProfile",
+        "CompetencyClaim",
+        "CompetencyEvidence",
+        "DelegationGrant",
+        "ConsentRecord",
+        "StaffingAssignmentProposal",
+        "LaborCoordinationRecord"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "HumanDigitalTwinProfile": {"$ref": "#/$defs/HumanDigitalTwinProfile"},
+        "CompetencyClaim": {"$ref": "#/$defs/CompetencyClaim"},
+        "CompetencyEvidence": {"$ref": "#/$defs/CompetencyEvidence"},
+        "DelegationGrant": {"$ref": "#/$defs/DelegationGrant"},
+        "ConsentRecord": {"$ref": "#/$defs/ConsentRecord"},
+        "StaffingAssignmentProposal": {"$ref": "#/$defs/StaffingAssignmentProposal"},
+        "LaborCoordinationRecord": {"$ref": "#/$defs/LaborCoordinationRecordArtifact"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation_type": {
+            "enum": ["staffing.assignment.propose", "staffing.assignment.accept"]
+          }
+        },
+        "required": ["operation_type"]
+      },
+      "then": {"required": ["decision_card"]}
+    }
+  ],
+  "$defs": {
+    "boundary_check": {
+      "type": "object",
+      "required": ["status", "reference"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"type": "string", "enum": ["passed", "failed"]},
+        "reference": {"type": "string", "minLength": 1},
+        "reason": {"type": "string"}
+      }
+    },
+    "HumanDigitalTwinProfile": {
+      "type": "object",
+      "required": ["artifact_id", "twin_id", "subject_id", "profile_state"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^hdtp_[a-zA-Z0-9_-]+$"},
+        "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+        "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+        "profile_state": {"type": "string", "enum": ["active", "suspended", "revoked"]}
+      }
+    },
+    "CompetencyClaim": {
+      "type": "object",
+      "required": ["artifact_id", "claim_id", "capability", "verification_status", "policy_state"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^cc_[a-zA-Z0-9_-]+$"},
+        "claim_id": {"type": "string", "pattern": "^claim_[a-zA-Z0-9_-]+$"},
+        "capability": {"type": "string", "minLength": 1},
+        "verification_status": {
+          "type": "string",
+          "enum": ["self_attested", "evidence_attached", "verified", "disputed", "expired", "retired"]
+        },
+        "policy_state": {"type": "string", "enum": ["pending_review", "admitted", "rejected"]}
+      }
+    },
+    "CompetencyEvidence": {
+      "type": "object",
+      "required": ["artifact_id", "evidence_id", "source_type", "trust_posture"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^ce_[a-zA-Z0-9_-]+$"},
+        "evidence_id": {"type": "string", "pattern": "^ev_[a-zA-Z0-9_-]+$"},
+        "source_type": {"type": "string"},
+        "trust_posture": {"type": "string", "enum": ["unverified", "source_attested", "third_party_verified", "system_verified"]}
+      }
+    },
+    "DelegationGrant": {
+      "type": "object",
+      "required": ["artifact_id", "grant_id", "agent_id", "scope", "expires_at", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^dg_artifact_[a-zA-Z0-9_-]+$"},
+        "grant_id": {"type": "string", "pattern": "^dg_[a-zA-Z0-9_-]+$"},
+        "agent_id": {"type": "string", "minLength": 1},
+        "scope": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "status": {"type": "string", "enum": ["active", "revoked", "expired"]},
+        "revoked_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "ConsentRecord": {
+      "type": "object",
+      "required": ["artifact_id", "consent_id", "purpose", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^consent_artifact_[a-zA-Z0-9_-]+$"},
+        "consent_id": {"type": "string", "pattern": "^cr_[a-zA-Z0-9_-]+$"},
+        "purpose": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["active", "revoked", "expired"]}
+      }
+    },
+    "StaffingAssignmentProposal": {
+      "type": "object",
+      "required": ["artifact_id", "proposal_id", "mission_id", "status", "decision_card_id"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^sap_artifact_[a-zA-Z0-9_-]+$"},
+        "proposal_id": {"type": "string", "pattern": "^sap_[a-zA-Z0-9_-]+$"},
+        "mission_id": {"type": "string", "pattern": "^mission_[a-zA-Z0-9_-]+$"},
+        "status": {"type": "string", "enum": ["proposed", "accepted", "rejected"]},
+        "decision_card_id": {"type": "string", "pattern": "^dc_[a-zA-Z0-9_-]+$"}
+      }
+    },
+    "LaborCoordinationRecordArtifact": {
+      "type": "object",
+      "required": ["artifact_id", "related_record_id", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^lcr_artifact_[a-zA-Z0-9_-]+$"},
+        "related_record_id": {"type": "string", "pattern": "^lcr_[a-zA-Z0-9_-]+$"},
+        "status": {"type": "string", "enum": ["admitted", "rejected", "pending"]}
+      }
+    }
+  }
+}

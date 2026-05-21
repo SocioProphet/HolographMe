@@ -71,9 +71,14 @@
         "additionalProperties": false,
         "properties": {
           "agent_id": {"type": "string"},
+          "delegation_grant_id": {"type": "string", "pattern": "^dg_[a-zA-Z0-9_-]+$"},
+          "consent_record_id": {"type": "string", "pattern": "^cr_[a-zA-Z0-9_-]+$"},
           "allowed_actions": {"type": "array", "items": {"type": "string"}},
           "authority_band": {"type": "string", "enum": ["observe", "recommend", "represent", "negotiate", "commit"]},
-          "expires_at": {"type": "string", "format": "date-time"}
+          "expires_at": {"type": "string", "format": "date-time"},
+          "status": {"type": "string", "enum": ["active", "revoked", "expired"]},
+          "revoked_at": {"type": "string", "format": "date-time"},
+          "revocation_reason": {"type": "string"}
         }
       }
     },

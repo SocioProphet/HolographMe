@@ -54,9 +54,12 @@
   "delegated_agents": [
     {
       "agent_id": "agent_intake_001",
-      "allowed_actions": ["summarize", "recommend_missions"],
+      "delegation_grant_id": "dg_staffing_alpha",
+      "consent_record_id": "cr_staffing_alpha",
+      "allowed_actions": ["summarize", "recommend_missions", "staffing.assignment.propose", "identity.claim.review"],
       "authority_band": "recommend",
-      "expires_at": "2026-06-04T18:00:00Z"
+      "expires_at": "2026-06-04T18:00:00Z",
+      "status": "active"
     }
   ],
   "consent_policy_ids": ["cp_example_alpha"],

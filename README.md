@@ -45,15 +45,12 @@ HolographMe is designed as the individual-owned primitive inside the broader Soc
 holographme/projection.py           Consent-scoped projection runtime
 holographme/delegation.py           Delegated-agent permission checks
 holographme/capability.py           Capability-claim event lifecycle runtime
-holographme/bundle.py               Governed export bundle manifest runtime
 scripts/generate_projection.py      CLI wrapper for mission-fit projections
 scripts/capability_event.py         CLI wrapper for capability-claim events
-scripts/bundle_manifest.py          CLI wrapper for export bundle manifests
 scripts/validate_schemas.py         JSON Schema/example validator
 tests/test_projection.py            Projection runtime tests
 tests/test_delegation.py            Delegation runtime tests
 tests/test_capability.py            Capability event runtime tests
-tests/test_bundle.py                Export bundle runtime tests
 
 docs/product-brief.md               Product and market framing
 docs/architecture.md                System architecture and bounded-control posture
@@ -66,7 +63,7 @@ schemas/mission.schema.json
 schemas/projection.schema.json
 schemas/projection-decision-log.schema.json
 schemas/capability-claim-event.schema.json
-schemas/export-bundle-manifest.schema.json
+schemas/labor-coordination-record.schema.json
 schemas/transition-receipt.schema.json
 
 examples/human-digital-twin.example.json
@@ -77,7 +74,7 @@ examples/projection-decision-log.example.json
 examples/projection-decision-log.rejected.example.json
 examples/capability-claim-event.example.json
 examples/capability-claim-event.append.example.json
-examples/export-bundle-manifest.example.json
+examples/labor-coordination-record.example.json
 examples/transition-receipt.example.json
 ```
 
@@ -106,18 +103,6 @@ The capability slice:
 6. emits a transition receipt with claim id, event id, previous status, and new status.
 
 Capability claims are not permanent truth. They are current-state summaries derived from auditable event history.
-
-### Governed export bundle
-
-The bundle slice:
-
-1. reads a set of local HolographMe JSON artifacts;
-2. computes stable SHA-256 digests for each artifact;
-3. derives the subject and twin identifiers from the included human digital twin;
-4. emits a portable export bundle manifest;
-5. computes a manifest-level bundle digest.
-
-This is the practical portability primitive: a person or trusted custodian can package the governed twin, policy, projection, decision log, capability event log, and receipts into one verifiable export inventory.
 
 ## Local validation
 
@@ -157,28 +142,10 @@ python3 scripts/capability_event.py \
   --receipt-id tr_ccev_claim_expired_001
 ```
 
-## Build a governed export bundle manifest
-
-```bash
-python3 scripts/bundle_manifest.py \
-  --bundle-id bundle_example_alpha \
-  --created-at 2026-05-05T18:30:00Z \
-  --custodian "SocioProphet HolographMe" \
-  --root . \
-  --artifact human-digital-twin=examples/human-digital-twin.example.json \
-  --artifact consent-policy=examples/consent-policy.example.json \
-  --artifact mission=examples/mission.example.json \
-  --artifact projection=examples/projection.example.json \
-  --artifact projection-decision-log=examples/projection-decision-log.example.json \
-  --artifact capability-claim-event-log=examples/capability-claim-event.example.json \
-  --artifact transition-receipt=examples/transition-receipt.example.json \
-  --out generated/export-bundle-manifest.json
-```
-
 ## License
 
 Apache-2.0. See `LICENSE`.
 
 ## Status
 
-The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, governed export bundles, transition receipts, tests, and CI.
+The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI.
