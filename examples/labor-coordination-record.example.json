@@ -1,0 +1,75 @@
+{
+  "schema_version": "0.1.0",
+  "record_id": "lcr_staffing_assignment_001",
+  "twin_id": "hdt_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "operation_type": "staffing.assignment.propose",
+  "timestamp": "2026-05-05T19:00:00Z",
+  "decision_card": {
+    "decision_card_id": "dc_staffing_assignment_001",
+    "status": "proposed",
+    "summary": "Proposal is pending explicit subject acceptance."
+  },
+  "authority_boundary": {
+    "delegation_check": {
+      "status": "passed",
+      "reference": "dg_staffing_alpha",
+      "reason": "Delegation grant is active and scoped for staffing.assignment.propose."
+    },
+    "policy_fabric_check": {
+      "status": "passed",
+      "reference": "pf_decision_001"
+    },
+    "agent_registry_check": {
+      "status": "passed",
+      "reference": "ar_attestation_001"
+    }
+  },
+  "artifacts": {
+    "HumanDigitalTwinProfile": {
+      "artifact_id": "hdtp_example_alpha",
+      "twin_id": "hdt_example_alpha",
+      "subject_id": "sub_example_alpha",
+      "profile_state": "active"
+    },
+    "CompetencyClaim": {
+      "artifact_id": "cc_agentic_systems_001",
+      "claim_id": "claim_agentic_systems_001",
+      "capability": "Agentic systems design",
+      "verification_status": "verified",
+      "policy_state": "admitted"
+    },
+    "CompetencyEvidence": {
+      "artifact_id": "ce_repo_001",
+      "evidence_id": "ev_repo_001",
+      "source_type": "repository",
+      "trust_posture": "source_attested"
+    },
+    "DelegationGrant": {
+      "artifact_id": "dg_artifact_staffing_alpha",
+      "grant_id": "dg_staffing_alpha",
+      "agent_id": "agent_intake_001",
+      "scope": ["staffing.assignment.propose", "identity.claim.review"],
+      "expires_at": "2026-06-04T18:00:00Z",
+      "status": "active"
+    },
+    "ConsentRecord": {
+      "artifact_id": "consent_artifact_staffing_001",
+      "consent_id": "cr_staffing_alpha",
+      "purpose": "staffing_assignment",
+      "status": "active"
+    },
+    "StaffingAssignmentProposal": {
+      "artifact_id": "sap_artifact_001",
+      "proposal_id": "sap_assignment_001",
+      "mission_id": "mission_agentic_upgrade_001",
+      "status": "proposed",
+      "decision_card_id": "dc_staffing_assignment_001"
+    },
+    "LaborCoordinationRecord": {
+      "artifact_id": "lcr_artifact_001",
+      "related_record_id": "lcr_staffing_assignment_000",
+      "status": "admitted"
+    }
+  }
+}
