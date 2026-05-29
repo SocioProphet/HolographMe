@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Dict
@@ -61,6 +62,10 @@ def main() -> int:
                 print(f"  - {path}: {error.message}")
         else:
             print(f"PASS {example_name} -> {schema_name}")
+
+    projection_loss_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_projection_loss_profile.py")], cwd=ROOT)
+    if projection_loss_result.returncode != 0:
+        failures += 1
 
     return 1 if failures else 0
 
