@@ -56,6 +56,7 @@ docs/product-brief.md               Product and market framing
 docs/architecture.md                System architecture and bounded-control posture
 docs/governance.md                  Consent, ownership, audit, and agentic delegation model
 docs/operating-model.md             Intake-to-mission lifecycle and consulting-agency workflow
+docs/projection-loss-profiles.md    Projection source-basis, loss-profile, and allowed-use doctrine
 
 schemas/human-digital-twin.schema.json
 schemas/consent-policy.schema.json
@@ -72,6 +73,7 @@ examples/mission.example.json
 examples/projection.example.json
 examples/projection-decision-log.example.json
 examples/projection-decision-log.rejected.example.json
+examples/projection-loss-profile.example.json
 examples/capability-claim-event.example.json
 examples/capability-claim-event.append.example.json
 examples/labor-coordination-record.example.json
@@ -90,6 +92,21 @@ The projection slice:
 4. emits a mission-fit projection;
 5. emits a projection decision log;
 6. emits a transition receipt.
+
+The generated projection includes only consented fields. In the example, `assessments.summary` is requested by the mission but denied because the consent policy does not allow it.
+
+### Projection loss profile
+
+Projection loss profiles describe what a projection is based on, what it omits, how it compresses the source, and what decisions it may or may not support.
+
+The first profile example lives at:
+
+- `docs/projection-loss-profiles.md`
+- `examples/projection-loss-profile.example.json`
+
+The example records source refs, channel refs, selection criteria, denied fields, loss modes, freshness posture, consent policy refs, evidence refs, allowed uses, disallowed uses, repair requirements, and non-claims.
+
+Schema validation for the projection-loss profile is intentionally deferred in this tranche. The schema write was blocked by the connector safety layer, so the current committed slice is doctrine plus example profile only.
 
 ### Capability-claim lifecycle
 
@@ -127,8 +144,6 @@ python3 scripts/generate_projection.py \
   --decision-log-id pdl_projection_001
 ```
 
-The generated projection includes only consented fields. In the example, `assessments.summary` is requested by the mission but denied because the consent policy does not allow it.
-
 ## Append a capability-claim event
 
 ```bash
@@ -148,4 +163,4 @@ Apache-2.0. See `LICENSE`.
 
 ## Status
 
-The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI.
+The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI. Projection-loss profile doctrine and an example profile are now present; schema/validator enforcement for that profile remains deferred.
