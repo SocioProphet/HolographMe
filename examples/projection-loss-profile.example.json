@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.1.0",
+  "profile_id": "plp_mission_fit_001",
+  "projection_id": "proj_mission_fit_001",
+  "projection_kind": "mission_fit",
+  "generated_at": "2026-05-29T16:30:00Z",
+  "source_basis": {
+    "source_refs": ["hdt_demo_001", "mission_demo_001", "cp_demo_001"],
+    "channel_refs": ["holographme:projection-runtime", "holographme:consent-policy"],
+    "selection_criteria": ["mission requested capability, availability, credentials, portfolio, and assessments"],
+    "coverage_basis": "Only fields allowed by the consent policy and selected by mission-fit projection rules are included."
+  },
+  "projection_method": {
+    "method": "consent-scoped field projection",
+    "compression_basis": "The projection exposes allowed fields and records denied fields through the decision log.",
+    "human_facing_rendering": true,
+    "producer_ref": "holographme/projection.py"
+  },
+  "loss_profile": {
+    "omitted_fields": ["non-requested twin fields"],
+    "denied_fields": ["assessments.summary"],
+    "loss_modes": ["consent_filtering", "source_selection", "field_redaction"],
+    "known_blind_spots": ["Projection is not a whole-twin view.", "Projection is not a complete work-history audit."]
+  },
+  "freshness_window": {
+    "valid_from": "2026-05-29T16:30:00Z",
+    "valid_to": null,
+    "stale_after": null,
+    "revalidation_ref": "re-run projection when mission, consent policy, or twin source changes"
+  },
+  "consent_policy_refs": ["cp_demo_001"],
+  "evidence_refs": ["examples/projection.example.json", "examples/projection-decision-log.example.json"],
+  "confidence": {
+    "confidence_type": "consent_verified",
+    "level": "high",
+    "score": 0.95
+  },
+  "allowed_uses": ["orientation", "candidate_screening", "dashboard_display"],
+  "disallowed_uses": ["publication", "export", "memory_promotion", "graph_promotion"],
+  "repair": {
+    "repair_required_for": ["publication", "export", "memory_promotion", "graph_promotion"],
+    "repair_event_refs": [],
+    "revalidation_path": "inspect projection decision log and regenerate projection from current consent policy"
+  },
+  "non_claims": [
+    "This profile does not certify the entire twin.",
+    "This profile does not claim omitted or denied fields are absent from the source twin.",
+    "This profile does not authorize downstream promotion outside the allowed uses."
+  ]
+}
