@@ -48,6 +48,7 @@ holographme/capability.py           Capability-claim event lifecycle runtime
 scripts/generate_projection.py      CLI wrapper for mission-fit projections
 scripts/capability_event.py         CLI wrapper for capability-claim events
 scripts/validate_schemas.py         JSON Schema/example validator
+scripts/validate_projection_loss_profile.py  Projection-loss profile invariant validator
 tests/test_projection.py            Projection runtime tests
 tests/test_delegation.py            Delegation runtime tests
 tests/test_capability.py            Capability event runtime tests
@@ -99,14 +100,15 @@ The generated projection includes only consented fields. In the example, `assess
 
 Projection loss profiles describe what a projection is based on, what it omits, how it compresses the source, and what decisions it may or may not support.
 
-The first profile example lives at:
+The first profile lane lives at:
 
 - `docs/projection-loss-profiles.md`
 - `examples/projection-loss-profile.example.json`
+- `scripts/validate_projection_loss_profile.py`
 
 The example records source refs, channel refs, selection criteria, denied fields, loss modes, freshness posture, consent policy refs, evidence refs, allowed uses, disallowed uses, repair requirements, and non-claims.
 
-Schema validation for the projection-loss profile is intentionally deferred in this tranche. The schema write was blocked by the connector safety layer, so the current committed slice is doctrine plus example profile only.
+The projection-loss profile is enforced by a schema-light invariant validator that is called by `scripts/validate_schemas.py`. Formal JSON Schema for this profile remains deferred because the schema write was blocked by the connector safety layer.
 
 ### Capability-claim lifecycle
 
@@ -163,4 +165,4 @@ Apache-2.0. See `LICENSE`.
 
 ## Status
 
-The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI. Projection-loss profile doctrine and an example profile are now present; schema/validator enforcement for that profile remains deferred.
+The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI. Projection-loss profile doctrine, an example profile, and schema-light invariant validation are now present; formal JSON Schema enforcement for that profile remains deferred.
