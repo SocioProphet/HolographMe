@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1.0",
+  "seal_id": "iss_rejected_portrait_biometric",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha",
+  "display_context": "agentic_work_identity",
+  "sigil": {
+    "sigil_id": "sigil_example_alpha",
+    "sigil_type": "curated",
+    "artifact_ref": "artifact://holographme/sigils/example-alpha.svg",
+    "artifact_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "generation_method": "user_curated",
+    "version": "0.1.0"
+  },
+  "portrait_policy": {
+    "portrait_bound": true,
+    "portrait_ref": "artifact://holographme/portraits/example-alpha.png",
+    "portrait_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "biometric_identity_claim": true,
+    "face_embedding_stored": true,
+    "public_default": true,
+    "revocable": false,
+    "selective_disclosure": false,
+    "context_bound": false
+  },
+  "signing_authorities": [
+    {
+      "authority_id": "sa_example_did",
+      "authority_type": "did",
+      "authority_ref": "did:key:zExampleAlpha",
+      "scopes": ["sigil_seal_assertion"],
+      "not_allowed_for": ["biometric_identification", "unscoped_public_correlation"],
+      "status": "active"
+    }
+  ],
+  "delegation_refs": [],
+  "reputation_refs": [],
+  "consent_policy_ids": ["cp_example_alpha"],
+  "transition_receipt_ids": ["tr_initial_001"],
+  "non_claims": [
+    "Sigil is not the person.",
+    "Wallet is not the person.",
+    "Agent action is not direct human action unless delegated and receipted.",
+    "Reputation is contextual evidence, not global human worth.",
+    "Seal does not globally correlate all identity contexts."
+  ]
+}
