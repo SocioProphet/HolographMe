@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1.0",
+  "seal_id": "iss_rejected_wallet_person",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha",
+  "display_context": "agentic_work_identity",
+  "sigil": {
+    "sigil_id": "sigil_example_alpha",
+    "sigil_type": "generated",
+    "artifact_ref": "artifact://holographme/sigils/example-alpha.svg",
+    "artifact_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "generation_method": "subject_commitment_hash",
+    "version": "0.1.0"
+  },
+  "portrait_policy": {
+    "portrait_bound": false,
+    "biometric_identity_claim": false,
+    "face_embedding_stored": false,
+    "public_default": false,
+    "revocable": true,
+    "selective_disclosure": true,
+    "context_bound": true
+  },
+  "signing_authorities": [
+    {
+      "authority_id": "sa_bad_wallet",
+      "authority_type": "wallet",
+      "authority_ref": "wallet:eip155:1:0x1111111111111111111111111111111111111111",
+      "scopes": ["personhood_claim", "sigil_seal_assertion"],
+      "status": "active"
+    }
+  ],
+  "delegation_refs": [],
+  "reputation_refs": [],
+  "consent_policy_ids": ["cp_example_alpha"],
+  "transition_receipt_ids": ["tr_initial_001"],
+  "non_claims": [
+    "Sigil is not the person.",
+    "Portrait is not biometric proof by default.",
+    "Agent action is not direct human action unless delegated and receipted.",
+    "Reputation is contextual evidence, not global human worth.",
+    "Seal does not globally correlate all identity contexts."
+  ]
+}
