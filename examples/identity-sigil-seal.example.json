@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1.0",
+  "seal_id": "iss_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha",
+  "display_context": "agentic_work_identity",
+  "sigil": {
+    "sigil_id": "sigil_example_alpha",
+    "sigil_type": "curated",
+    "artifact_ref": "artifact://holographme/sigils/example-alpha.svg",
+    "artifact_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "generation_method": "user_curated",
+    "version": "0.1.0"
+  },
+  "portrait_policy": {
+    "portrait_bound": true,
+    "portrait_ref": "artifact://holographme/portraits/example-alpha.png",
+    "portrait_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "biometric_identity_claim": false,
+    "face_embedding_stored": false,
+    "public_default": false,
+    "revocable": true,
+    "selective_disclosure": true,
+    "context_bound": true
+  },
+  "signing_authorities": [
+    {
+      "authority_id": "sa_example_did",
+      "authority_type": "did",
+      "authority_ref": "did:key:zExampleAlpha",
+      "scopes": ["sigil_seal_assertion", "agent_delegation", "credential_presentation"],
+      "not_allowed_for": ["biometric_identification", "unscoped_public_correlation"],
+      "status": "active",
+      "valid_from": "2026-05-04T18:00:00Z"
+    },
+    {
+      "authority_id": "sa_example_wallet",
+      "authority_type": "wallet",
+      "authority_ref": "wallet:eip155:1:0x0000000000000000000000000000000000000000",
+      "scopes": ["public_profile_signature"],
+      "not_allowed_for": ["personhood_claim", "guardian_recovery", "agent_commit_authority"],
+      "status": "active",
+      "valid_from": "2026-05-04T18:00:00Z"
+    }
+  ],
+  "delegation_refs": ["dg_staffing_alpha"],
+  "reputation_refs": ["reputation://developer/example-alpha/trusted-reviewer"],
+  "consent_policy_ids": ["cp_example_alpha"],
+  "transition_receipt_ids": ["tr_initial_001"],
+  "proof": {
+    "proof_type": "DataIntegrityProof",
+    "created": "2026-05-04T18:30:00Z",
+    "verification_method": "did:key:zExampleAlpha#key-1",
+    "proof_purpose": "assertionMethod",
+    "payload_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "non_claims": [
+    "Sigil is not the person.",
+    "Portrait is not biometric proof by default.",
+    "Wallet is not the person.",
+    "Agent action is not direct human action unless delegated and receipted.",
+    "Reputation is contextual evidence, not global human worth.",
+    "Seal does not globally correlate all identity contexts."
+  ]
+}
