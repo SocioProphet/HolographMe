@@ -24,6 +24,7 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "capability-claim-event.example.json": "capability-claim-event.schema.json",
     "export-bundle-manifest.example.json": "export-bundle-manifest.schema.json",
     "labor-coordination-record.example.json": "labor-coordination-record.schema.json",
+    "identity-sigil-seal.example.json": "identity-sigil-seal.schema.json",
 }
 
 
@@ -65,6 +66,10 @@ def main() -> int:
 
     projection_loss_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_projection_loss_profile.py")], cwd=ROOT)
     if projection_loss_result.returncode != 0:
+        failures += 1
+
+    sigil_seal_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_identity_sigil_seal.py")], cwd=ROOT)
+    if sigil_seal_result.returncode != 0:
         failures += 1
 
     return 1 if failures else 0
