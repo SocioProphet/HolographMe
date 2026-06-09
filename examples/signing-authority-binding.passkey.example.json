@@ -1,0 +1,37 @@
+{
+  "schema_version": "0.1.0",
+  "authority_id": "sa_passkey_primary_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "personhood_binding_ref": "pbr_example_alpha",
+  "authority_type": "passkey",
+  "authority_ref": "passkey://example-alpha/primary",
+  "scopes": [
+    "authentication",
+    "sigil_seal_assertion",
+    "credential_presentation"
+  ],
+  "not_allowed_for": [
+    "sole_personhood_binding",
+    "unreviewed_agent_commit_authority",
+    "global_identity_correlation"
+  ],
+  "recovery_posture": "recoverable_by_guardian_quorum",
+  "status": "active_primary",
+  "proofs": [
+    {
+      "proof_type": "webauthn_or_passkey_challenge",
+      "verified_at": "2026-05-04T18:55:00Z",
+      "evidence_ref": "receipt://passkey-control-proof/example-alpha",
+      "verifier_ref": "verifier://holographme/local"
+    }
+  ],
+  "valid_from": "2026-05-04T18:55:00Z",
+  "expires_at": null,
+  "transition_receipt_ids": ["tr_initial_001"],
+  "non_claims": [
+    "Signing authority is a scoped controller, not the person.",
+    "Passkey control does not establish personhood by itself.",
+    "Signing authority cannot override personhood binding ceremony requirements.",
+    "Signing authority cannot globally correlate all identity contexts."
+  ]
+}
