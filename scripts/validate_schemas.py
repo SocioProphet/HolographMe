@@ -25,6 +25,7 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "export-bundle-manifest.example.json": "export-bundle-manifest.schema.json",
     "labor-coordination-record.example.json": "labor-coordination-record.schema.json",
     "identity-sigil-seal.example.json": "identity-sigil-seal.schema.json",
+    "personhood-binding-record.example.json": "personhood-binding-record.schema.json",
 }
 
 
@@ -70,6 +71,10 @@ def main() -> int:
 
     sigil_seal_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_identity_sigil_seal.py")], cwd=ROOT)
     if sigil_seal_result.returncode != 0:
+        failures += 1
+
+    personhood_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_personhood_binding.py")], cwd=ROOT)
+    if personhood_result.returncode != 0:
         failures += 1
 
     return 1 if failures else 0
