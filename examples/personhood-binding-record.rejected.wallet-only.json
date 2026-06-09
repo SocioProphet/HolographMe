@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "binding_id": "pbr_rejected_wallet_only",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha",
+  "binding_scope": "identity_mesh_root",
+  "assurance_level": "P3_guardian_or_witness_supported",
+  "ceremony": {
+    "ceremony_id": "ceremony_rejected_wallet_only",
+    "ceremony_type": "self_attested",
+    "performed_at": "2026-05-04T18:20:00Z",
+    "performed_by": ["subject"],
+    "subject_consent_ref": "wallet:eip155:1:0x1111111111111111111111111111111111111111"
+  },
+  "evidence_classes": [
+    {
+      "class": "account_continuity",
+      "evidence_refs": ["wallet:eip155:1:0x1111111111111111111111111111111111111111"],
+      "issuer_or_witness_ref": "wallet:eip155:1:0x1111111111111111111111111111111111111111",
+      "status": "active"
+    }
+  ],
+  "proof_policy": {
+    "minimum_independent_evidence_classes": 1,
+    "requires_subject_consent": true,
+    "requires_recovery_path": false,
+    "requires_revocation_path": false,
+    "forbids_single_factor_personhood": false,
+    "forbids_biometric_mandate": true,
+    "allows_pseudonymous_binding": true
+  },
+  "recovery_policy_ref": "none",
+  "revocation": {
+    "revocable": false,
+    "method": "none",
+    "subject_can_contest": false,
+    "correction_supported": false
+  },
+  "transition_receipt_ids": ["tr_initial_001"],
+  "status": "active",
+  "non_claims": [
+    "Personhood binding does not make any portrait biometric proof by default.",
+    "Personhood binding does not make any account the person.",
+    "Personhood binding does not expose all identity contexts.",
+    "Personhood binding does not erase the human right to correct, revoke, or contest.",
+    "Personhood binding does not make any agent action direct human action."
+  ]
+}
