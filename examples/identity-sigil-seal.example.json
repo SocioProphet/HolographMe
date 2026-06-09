@@ -3,6 +3,7 @@
   "seal_id": "iss_example_alpha",
   "subject_id": "sub_example_alpha",
   "twin_id": "hdt_example_alpha",
+  "personhood_binding_ref": "pbr_example_alpha",
   "display_context": "agentic_work_identity",
   "sigil": {
     "sigil_id": "sigil_example_alpha",
@@ -56,6 +57,7 @@
   },
   "non_claims": [
     "Sigil is not the person.",
+    "Personhood binding, not sigil alone, binds the mesh to a living human subject.",
     "Portrait is not biometric proof by default.",
     "Wallet is not the person.",
     "Agent action is not direct human action unless delegated and receipted.",
