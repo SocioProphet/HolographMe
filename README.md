@@ -49,6 +49,7 @@ scripts/generate_projection.py      CLI wrapper for mission-fit projections
 scripts/capability_event.py         CLI wrapper for capability-claim events
 scripts/validate_schemas.py         JSON Schema/example validator
 scripts/validate_projection_loss_profile.py  Projection-loss profile invariant validator
+scripts/validate_identity_sigil_seal.py      Identity Sigil Seal semantic validator
 tests/test_projection.py            Projection runtime tests
 tests/test_delegation.py            Delegation runtime tests
 tests/test_capability.py            Capability event runtime tests
@@ -58,6 +59,7 @@ docs/architecture.md                System architecture and bounded-control post
 docs/governance.md                  Consent, ownership, audit, and agentic delegation model
 docs/operating-model.md             Intake-to-mission lifecycle and consulting-agency workflow
 docs/projection-loss-profiles.md    Projection source-basis, loss-profile, and allowed-use doctrine
+docs/identity-sigil-seal.md         Sigil/seal, signing authority, delegation, and reputation doctrine
 
 schemas/human-digital-twin.schema.json
 schemas/consent-policy.schema.json
@@ -67,6 +69,7 @@ schemas/projection-decision-log.schema.json
 schemas/capability-claim-event.schema.json
 schemas/labor-coordination-record.schema.json
 schemas/transition-receipt.schema.json
+schemas/identity-sigil-seal.schema.json
 
 examples/human-digital-twin.example.json
 examples/consent-policy.example.json
@@ -79,6 +82,9 @@ examples/capability-claim-event.example.json
 examples/capability-claim-event.append.example.json
 examples/labor-coordination-record.example.json
 examples/transition-receipt.example.json
+examples/identity-sigil-seal.example.json
+examples/identity-sigil-seal.rejected.wallet-is-person.json
+examples/identity-sigil-seal.rejected.portrait-biometric-default.json
 ```
 
 ## Executable slices
@@ -109,6 +115,29 @@ The first profile lane lives at:
 The example records source refs, channel refs, selection criteria, denied fields, loss modes, freshness posture, consent policy refs, evidence refs, allowed uses, disallowed uses, repair requirements, and non-claims.
 
 The projection-loss profile is enforced by a schema-light invariant validator that is called by `scripts/validate_schemas.py`. Formal JSON Schema for this profile remains deferred because the schema write was blocked by the connector safety layer.
+
+### Identity Sigil Seal
+
+The Identity Sigil Seal slice binds a subject-owned twin to a human-recognizable sigil, optional portrait policy, scoped signing authorities, consent policy refs, delegation refs, reputation refs, and transition receipts.
+
+This slice preserves the following boundaries:
+
+- a sigil is not the person;
+- a portrait is not biometric proof by default;
+- a wallet is not the person;
+- an agent action is not direct human action unless delegated and receipted;
+- reputation is contextual evidence, not global human worth.
+
+The first lane lives at:
+
+- `docs/identity-sigil-seal.md`
+- `schemas/identity-sigil-seal.schema.json`
+- `examples/identity-sigil-seal.example.json`
+- `examples/identity-sigil-seal.rejected.wallet-is-person.json`
+- `examples/identity-sigil-seal.rejected.portrait-biometric-default.json`
+- `scripts/validate_identity_sigil_seal.py`
+
+`validate_identity_sigil_seal.py` performs semantic checks that JSON Schema alone cannot express cleanly, including wallet/person collapse, portrait-as-biometric-default, missing non-claims, forbidden authority scopes, and missing transition continuity.
 
 ### Capability-claim lifecycle
 
@@ -165,4 +194,4 @@ Apache-2.0. See `LICENSE`.
 
 ## Status
 
-The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI. Projection-loss profile doctrine, an example profile, and schema-light invariant validation are now present; formal JSON Schema enforcement for that profile remains deferred.
+The repo has crossed from inception docs into an executable bridge: schemas, examples, validation, consent-scoped projection, projection decision logs, delegation checks, capability-claim event lifecycle, transition receipts, tests, and CI. Projection-loss profile doctrine, an example profile, and schema-light invariant validation are now present; formal JSON Schema enforcement for that profile remains deferred. Identity Sigil Seal doctrine, schema, fixtures, and semantic validation are now present as the first governed bridge between visual identity presentation, scoped signing authority, delegation, and contextual reputation.
