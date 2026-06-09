@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/personhood-binding-record.schema.json",
+  "title": "PersonhoodBindingRecord",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "binding_id",
+    "subject_id",
+    "twin_id",
+    "binding_scope",
+    "assurance_level",
+    "ceremony",
+    "evidence_classes",
+    "proof_policy",
+    "recovery_policy_ref",
+    "revocation",
+    "transition_receipt_ids",
+    "status",
+    "non_claims"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^0\\.1\\.[0-9]+$"},
+    "binding_id": {"type": "string", "pattern": "^pbr_[a-zA-Z0-9_-]+$"},
+    "subject_id": {"type": "string", "pattern": "^sub_[a-zA-Z0-9_-]+$"},
+    "twin_id": {"type": "string", "pattern": "^hdt_[a-zA-Z0-9_-]+$"},
+    "binding_scope": {"type": "string", "enum": ["identity_mesh_root", "work_identity", "developer_identity", "regulated_identity", "pseudonymous_identity"]},
+    "assurance_level": {"type": "string", "enum": ["P0_unbound_pseudonym", "P1_self_attested", "P2_liveness_key_continuity", "P3_guardian_or_witness_supported", "P4_institutional_credential_supported", "P5_regulated_high_assurance"]},
+    "ceremony": {
+      "type": "object",
+      "required": ["ceremony_id", "ceremony_type", "performed_at", "performed_by", "subject_consent_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "ceremony_id": {"type": "string", "pattern": "^ceremony_[a-zA-Z0-9_-]+$"},
+        "ceremony_type": {"type": "string", "enum": ["self_attested", "self_attested_with_liveness", "self_attested_with_guardian", "self_attested_with_guardian_and_credential", "regulated_proofing"]},
+        "performed_at": {"type": "string", "format": "date-time"},
+        "performed_by": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["subject", "guardian", "witness", "verifier", "institution", "operator"]}},
+        "subject_consent_ref": {"type": "string", "minLength": 1},
+        "notes": {"type": "string"}
+      }
+    },
+    "evidence_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["class", "evidence_refs", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "class": {"type": "string", "enum": ["self_attestation", "liveness_or_presence", "credential_attestation", "guardian_or_witness_attestation", "device_key_continuity", "account_continuity", "recovery_policy", "revocation_policy"]},
+          "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "issuer_or_witness_ref": {"type": "string"},
+          "status": {"type": "string", "enum": ["active", "pending_review", "expired", "revoked", "contested"]},
+          "collected_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "proof_policy": {
+      "type": "object",
+      "required": ["minimum_independent_evidence_classes", "requires_subject_consent", "requires_recovery_path", "requires_revocation_path", "forbids_single_factor_personhood", "forbids_biometric_mandate"],
+      "additionalProperties": false,
+      "properties": {
+        "minimum_independent_evidence_classes": {"type": "integer", "minimum": 1},
+        "requires_subject_consent": {"type": "boolean"},
+        "requires_recovery_path": {"type": "boolean"},
+        "requires_revocation_path": {"type": "boolean"},
+        "forbids_single_factor_personhood": {"type": "boolean"},
+        "forbids_biometric_mandate": {"type": "boolean"},
+        "allows_pseudonymous_binding": {"type": "boolean"}
+      }
+    },
+    "recovery_policy_ref": {"type": "string", "minLength": 1},
+    "revocation": {
+      "type": "object",
+      "required": ["revocable", "method", "subject_can_contest", "correction_supported"],
+      "additionalProperties": false,
+      "properties": {
+        "revocable": {"type": "boolean"},
+        "method": {"type": "string"},
+        "subject_can_contest": {"type": "boolean"},
+        "correction_supported": {"type": "boolean"},
+        "contact": {"type": "string"}
+      }
+    },
+    "transition_receipt_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^tr_[a-zA-Z0-9_-]+$"}},
+    "status": {"type": "string", "enum": ["active", "pending_review", "suspended", "revoked", "contested", "superseded"]},
+    "non_claims": {"type": "array", "minItems": 5, "items": {"type": "string"}}
+  }
+}
