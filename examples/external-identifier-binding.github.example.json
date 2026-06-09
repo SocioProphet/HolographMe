@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "binding_id": "eib_github_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "personhood_binding_ref": "pbr_example_alpha",
+  "external_identifier": {
+    "kind": "github_account",
+    "value": "github:example-alpha",
+    "issuer_or_platform": "GitHub",
+    "redacted": false
+  },
+  "proofs": [
+    {
+      "proof_type": "signed_commit_or_oauth_challenge",
+      "verified_at": "2026-05-04T18:50:00Z",
+      "evidence_ref": "receipt://github-control-proof/example-alpha",
+      "verifier_ref": "verifier://holographme/local"
+    }
+  ],
+  "allowed_uses": [
+    "developer_reputation",
+    "repo_authority",
+    "code_provenance"
+  ],
+  "disallowed_uses": [
+    "legal_identity",
+    "medical_identity",
+    "global_personhood",
+    "sole_personhood_binding"
+  ],
+  "status": "active_secondary",
+  "portable": false,
+  "retirable": false,
+  "replacement_available": true,
+  "risk": [
+    "platform_dependency",
+    "account_recovery_dependency",
+    "public_correlation_risk"
+  ],
+  "transition_receipt_ids": ["tr_initial_001"],
+  "expires_at": null,
+  "non_claims": [
+    "GitHub account is not the person.",
+    "External identifier binding is contextual, not global identity unification.",
+    "External identifier binding does not establish personhood by itself.",
+    "Platform account continuity is evidence, not essence."
+  ]
+}
