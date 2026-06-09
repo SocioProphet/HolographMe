@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.1.0",
+  "binding_id": "pbr_example_alpha",
+  "subject_id": "sub_example_alpha",
+  "twin_id": "hdt_example_alpha",
+  "binding_scope": "identity_mesh_root",
+  "assurance_level": "P3_guardian_or_witness_supported",
+  "ceremony": {
+    "ceremony_id": "ceremony_example_alpha",
+    "ceremony_type": "self_attested_with_guardian",
+    "performed_at": "2026-05-04T18:20:00Z",
+    "performed_by": ["subject", "guardian", "verifier"],
+    "subject_consent_ref": "consent://personhood/example-alpha/self-attestation",
+    "notes": "Example fixture binds a governed identity mesh to a living human subject using independent evidence classes."
+  },
+  "evidence_classes": [
+    {
+      "class": "self_attestation",
+      "evidence_refs": ["ev_self_attestation_001"],
+      "issuer_or_witness_ref": "sub_example_alpha",
+      "status": "active",
+      "collected_at": "2026-05-04T18:20:00Z"
+    },
+    {
+      "class": "liveness_or_presence",
+      "evidence_refs": ["ev_liveness_presence_001"],
+      "issuer_or_witness_ref": "verifier://example-alpha",
+      "status": "active",
+      "collected_at": "2026-05-04T18:21:00Z"
+    },
+    {
+      "class": "guardian_or_witness_attestation",
+      "evidence_refs": ["ev_guardian_attestation_001"],
+      "issuer_or_witness_ref": "guardian://example-alpha/primary",
+      "status": "active",
+      "collected_at": "2026-05-04T18:22:00Z"
+    },
+    {
+      "class": "device_key_continuity",
+      "evidence_refs": ["ev_device_key_continuity_001"],
+      "issuer_or_witness_ref": "did:key:zExampleAlpha",
+      "status": "active",
+      "collected_at": "2026-05-04T18:23:00Z"
+    },
+    {
+      "class": "recovery_policy",
+      "evidence_refs": ["recovery://example-alpha/policy-v1"],
+      "issuer_or_witness_ref": "sub_example_alpha",
+      "status": "active",
+      "collected_at": "2026-05-04T18:24:00Z"
+    },
+    {
+      "class": "revocation_policy",
+      "evidence_refs": ["revocation://example-alpha/policy-v1"],
+      "issuer_or_witness_ref": "sub_example_alpha",
+      "status": "active",
+      "collected_at": "2026-05-04T18:25:00Z"
+    }
+  ],
+  "proof_policy": {
+    "minimum_independent_evidence_classes": 3,
+    "requires_subject_consent": true,
+    "requires_recovery_path": true,
+    "requires_revocation_path": true,
+    "forbids_single_factor_personhood": true,
+    "forbids_biometric_mandate": true,
+    "allows_pseudonymous_binding": true
+  },
+  "recovery_policy_ref": "recovery://example-alpha/policy-v1",
+  "revocation": {
+    "revocable": true,
+    "method": "subject_or_guardian_quorum_with_transition_receipt",
+    "subject_can_contest": true,
+    "correction_supported": true,
+    "contact": "governance@example.invalid"
+  },
+  "transition_receipt_ids": ["tr_initial_001"],
+  "status": "active",
+  "non_claims": [
+    "Personhood binding does not make any wallet the person.",
+    "Personhood binding does not make any portrait biometric proof by default.",
+    "Personhood binding does not make any account the person.",
+    "Personhood binding does not expose all identity contexts.",
+    "Personhood binding does not erase the human right to correct, revoke, or contest.",
+    "Personhood binding does not make any agent action direct human action."
+  ]
+}
