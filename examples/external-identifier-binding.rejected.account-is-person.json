@@ -1,0 +1,42 @@
+{
+  "schema_version": "0.1.0",
+  "binding_id": "eib_rejected_account_is_person",
+  "subject_id": "sub_example_alpha",
+  "personhood_binding_ref": "pbr_example_alpha",
+  "external_identifier": {
+    "kind": "google_account",
+    "value": "google:example-alpha@example.invalid",
+    "issuer_or_platform": "Google",
+    "redacted": false
+  },
+  "proofs": [
+    {
+      "proof_type": "oauth_control_challenge",
+      "verified_at": "2026-05-04T18:50:00Z",
+      "evidence_ref": "receipt://google-control-proof/example-alpha",
+      "verifier_ref": "verifier://holographme/local"
+    }
+  ],
+  "allowed_uses": [
+    "global_personhood",
+    "legal_identity",
+    "sole_personhood_binding"
+  ],
+  "disallowed_uses": [
+    "none"
+  ],
+  "status": "active_primary",
+  "portable": false,
+  "retirable": false,
+  "replacement_available": false,
+  "risk": [
+    "platform_dependency"
+  ],
+  "transition_receipt_ids": ["tr_initial_001"],
+  "expires_at": null,
+  "non_claims": [
+    "External identifier binding is contextual, not global identity unification.",
+    "External identifier binding does not establish personhood by itself.",
+    "Platform account continuity is evidence, not essence."
+  ]
+}
