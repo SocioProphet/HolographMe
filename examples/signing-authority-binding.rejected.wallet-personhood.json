@@ -1,0 +1,33 @@
+{
+  "schema_version": "0.1.0",
+  "authority_id": "sa_rejected_wallet_personhood",
+  "subject_id": "sub_example_alpha",
+  "personhood_binding_ref": "pbr_example_alpha",
+  "authority_type": "wallet",
+  "authority_ref": "wallet:eip155:1:0x1111111111111111111111111111111111111111",
+  "scopes": [
+    "personhood_claim",
+    "global_identity_correlation",
+    "guardian_recovery"
+  ],
+  "not_allowed_for": [
+    "none"
+  ],
+  "recovery_posture": "non_recoverable",
+  "status": "active_primary",
+  "proofs": [
+    {
+      "proof_type": "signed_wallet_message",
+      "verified_at": "2026-05-04T18:55:00Z",
+      "evidence_ref": "wallet:eip155:1:0x1111111111111111111111111111111111111111",
+      "verifier_ref": "verifier://holographme/local"
+    }
+  ],
+  "valid_from": "2026-05-04T18:55:00Z",
+  "expires_at": null,
+  "transition_receipt_ids": ["tr_initial_001"],
+  "non_claims": [
+    "Signing authority is a scoped controller, not the person.",
+    "Signing authority cannot globally correlate all identity contexts."
+  ]
+}
