@@ -26,6 +26,10 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "labor-coordination-record.example.json": "labor-coordination-record.schema.json",
     "identity-sigil-seal.example.json": "identity-sigil-seal.schema.json",
     "personhood-binding-record.example.json": "personhood-binding-record.schema.json",
+    "external-identifier-binding.github.example.json": "external-identifier-binding.schema.json",
+    "external-identifier-binding.rejected.account-is-person.json": "external-identifier-binding.schema.json",
+    "signing-authority-binding.passkey.example.json": "signing-authority-binding.schema.json",
+    "signing-authority-binding.rejected.wallet-personhood.json": "signing-authority-binding.schema.json",
 }
 
 
@@ -75,6 +79,14 @@ def main() -> int:
 
     personhood_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_personhood_binding.py")], cwd=ROOT)
     if personhood_result.returncode != 0:
+        failures += 1
+
+    external_id_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_external_identifier_binding.py")], cwd=ROOT)
+    if external_id_result.returncode != 0:
+        failures += 1
+
+    signing_authority_result = subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_signing_authority_binding.py")], cwd=ROOT)
+    if signing_authority_result.returncode != 0:
         failures += 1
 
     return 1 if failures else 0
