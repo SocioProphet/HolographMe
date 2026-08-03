@@ -28,6 +28,7 @@
   "transition_receipt_ids": ["tr_initial_001"],
   "non_claims": [
     "Signing authority is a scoped controller, not the person.",
-    "Signing authority cannot globally correlate all identity contexts."
+    "Signing authority cannot globally correlate all identity contexts.",
+    "A wallet does not by itself establish personhood."
   ]
 }

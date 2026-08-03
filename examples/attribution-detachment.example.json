@@ -1,0 +1,5 @@
+{ "schema_version": "0.1.0", "detachment_id": "det:001", "subject_profile_ref": "hp:baduser",
+  "claim_ref": "claim:artifact:0001", "decision_ledger_ref": "dl:detach:det:001",
+  "action": "detach_attribution",
+  "effect": { "persona_id_nulled": true, "reach_revoked": true, "claim_retained": true },
+  "reason": "proven_integrity_failure" }
