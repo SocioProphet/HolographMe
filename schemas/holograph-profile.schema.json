@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/holograph-profile.schema.json",
+  "title": "HolographProfile",
+  "description": "Anonymous-but-transparent profile + reputation over a HolographMe twin. Realizes the profile design: tiers (New->Stellar Gateway), the Maister Trust Equation (Credibility+Reliability+Intimacy)/Self-Orientation, Energy Spectrum (Knowledge/Creativity/Civility), reputation anchored to a ledgered action-history, and an anonymous sentiment (Plutchik) map. Persona is detachable (see attribution-detachment).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","profile_id","twin_ref","persona","tier","trust_equation","reputation"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "profile_id": { "type": "string" },
+    "twin_ref": { "type": "string", "description": "human-digital-twin.twin_id this profile projects" },
+    "persona": {
+      "type": "object", "additionalProperties": false, "required": ["persona_id","anonymous","detachable"],
+      "properties": {
+        "persona_id": { "type": ["string","null"], "description": "public handle; null when attribution is detached" },
+        "display_handle": { "type": ["string","null"] },
+        "anonymous": { "type": "boolean" },
+        "detachable": { "type": "boolean", "default": true }
+      }
+    },
+    "tier": { "type": "string", "enum": ["new","emerging","mature","visible","stellar_gateway"] },
+    "trust_equation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["credibility","reliability","intimacy","self_orientation","trust_score"],
+      "properties": {
+        "credibility": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reliability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "intimacy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "self_orientation": { "type": "number", "exclusiveMinimum": 0, "description": "denominator; Maister: T=(C+R+I)/S" },
+        "trust_score": { "type": "number", "description": "= (credibility+reliability+intimacy)/self_orientation" }
+      }
+    },
+    "energy_spectrum": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "knowledge": { "type": "number", "minimum": 0, "maximum": 1 },
+        "creativity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "civility": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "reputation": {
+      "type": "object", "additionalProperties": false, "required": ["score","action_history_ref"],
+      "properties": {
+        "score": { "type": "number" },
+        "action_history_ref": { "type": "string", "description": "hyperbolic action history anchored to the DecisionLedger (every reputational action is a ledgered decision)" }
+      }
+    },
+    "emotion_map": {
+      "type": "object", "description": "anonymous sentiment (Plutchik dyads)", "additionalProperties": false,
+      "properties": {
+        "trust": {"type":"number"}, "joy": {"type":"number"}, "anticipation": {"type":"number"},
+        "anger": {"type":"number"}, "disgust": {"type":"number"}, "sadness": {"type":"number"},
+        "surprise": {"type":"number"}, "fear": {"type":"number"}
+      }
+    },
+    "consent_policy_ids": { "type": "array", "items": { "type": "string" } },
+    "state_hash": { "type": "string" }
+  }
+}

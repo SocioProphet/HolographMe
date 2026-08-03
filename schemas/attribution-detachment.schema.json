@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/holographme/attribution-detachment.schema.json",
+  "title": "AttributionDetachment",
+  "description": "Truth & Knowledge Commons detachment op: on violation/uncorrected-integrity-failure, revoke distribution reach and NULL the persona_id (remove the public persona from search/feeds) WHILE retaining the artifact + claim on the immutable ledger. The 'anonymous-but-transparent' reversal. Every detachment is itself a ledgered decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","detachment_id","subject_profile_ref","claim_ref","decision_ledger_ref","action","effect","reason"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "detachment_id": { "type": "string" },
+    "subject_profile_ref": { "type": "string", "description": "holograph-profile.profile_id" },
+    "claim_ref": { "type": "string", "description": "the artifact/claim retained on the immutable ledger" },
+    "decision_ledger_ref": { "type": "string", "description": "the DecisionLedgerEntry that authorized this detachment" },
+    "action": { "type": "string", "enum": ["revoke_reach","detach_attribution","tombstone"] },
+    "effect": {
+      "type": "object", "additionalProperties": false, "required": ["persona_id_nulled","reach_revoked","claim_retained"],
+      "properties": {
+        "persona_id_nulled": { "type": "boolean" },
+        "reach_revoked": { "type": "boolean" },
+        "claim_retained": { "type": "boolean", "const": true, "description": "the claim/artifact is NEVER deleted — only the public persona is detached" }
+      }
+    },
+    "reason": { "type": "string", "enum": ["no_correction_response","proven_integrity_failure","user_request","policy"] }
+  }
+}

@@ -1,0 +1,8 @@
+{ "schema_version": "0.1.0", "profile_id": "hp:jill", "twin_ref": "hdt:jill",
+  "persona": { "persona_id": "jill.analyst", "display_handle": "Jill", "anonymous": false, "detachable": true },
+  "tier": "mature",
+  "trust_equation": { "credibility": 0.9, "reliability": 0.8, "intimacy": 0.6, "self_orientation": 0.5, "trust_score": 4.6 },
+  "energy_spectrum": { "knowledge": 0.82, "creativity": 0.64, "civility": 0.71 },
+  "reputation": { "score": 4.7, "action_history_ref": "dl:chain:hp:jill" },
+  "emotion_map": { "trust": 0.7, "joy": 0.4, "anticipation": 0.5, "anger": 0.05, "disgust": 0.02, "sadness": 0.1, "surprise": 0.2, "fear": 0.05 },
+  "consent_policy_ids": ["cp:default"], "state_hash": "blake3:deadbeef" }

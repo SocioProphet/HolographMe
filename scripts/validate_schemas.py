@@ -25,6 +25,8 @@ EXAMPLE_TO_SCHEMA: Dict[str, str] = {
     "export-bundle-manifest.example.json": "export-bundle-manifest.schema.json",
     "labor-coordination-record.example.json": "labor-coordination-record.schema.json",
     "identity-sigil-seal.example.json": "identity-sigil-seal.schema.json",
+    "holograph-profile.example.json": "holograph-profile.schema.json",
+    "attribution-detachment.example.json": "attribution-detachment.schema.json",
     "personhood-binding-record.example.json": "personhood-binding-record.schema.json",
     "external-identifier-binding.github.example.json": "external-identifier-binding.schema.json",
     "external-identifier-binding.rejected.account-is-person.json": "external-identifier-binding.schema.json",
